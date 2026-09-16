@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-
-interface Transaction {
-  id: number
-  date: Date
-  description: string
-  amount: number
-}
+import type { Transaction } from '@/types/Transaction.ts'
+import TransactionList from './components/TransactionList.vue'
 
 const transactions = ref<Transaction[]>([
   { id: 1, date: new Date(2026, 8, 15), description: 'Salaire', amount: 2000 },
@@ -45,22 +40,7 @@ function addTransaction(date: string, description: string, amount: number) {
   <h1>Mon Ledger</h1>
   <div>Solde : {{ solde }} €</div>
   <h2>Transactions</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Montant</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="trans in transactions" :key="trans.id">
-        <td>{{ trans.date.getDate() }}/{{ trans.date.getMonth() + 1 }}</td>
-        <td>{{ trans.description }}</td>
-        <td>{{ trans.amount }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <TransactionList :transactions="transactions" />
   <form @submit.prevent="addTransaction(TDateInput, TDescriptInput, TAmountInput)">
     <label for="TDateInput">Date de la transaction</label>
     <input type="date" id="TDateInput" v-model="TDateInput" />
