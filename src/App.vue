@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import type { Transaction } from '@/types/Transaction.ts'
 import TransactionList from './components/TransactionList.vue'
+import TransactionForm from './components/TransactionForm.vue'
 
 const transactions = ref<Transaction[]>([
   { id: 1, date: new Date(2026, 8, 15), description: 'Salaire', amount: 2000 },
@@ -15,24 +16,14 @@ const solde = computed(() => {
   }, 0)
 })
 
-const TDateInput = ref('')
-const TDescriptInput = ref('')
-const TAmountInput = ref(0)
-
-function addTransaction(date: string, description: string, amount: number) {
-  if (date && description && amount !== 0) {
-    const lastT = transactions.value.at(-1)
-    transactions.value.push({
-      id: lastT ? lastT.id + 1 : 1,
-      date: new Date(date),
-      description: description,
-      amount: amount,
-    })
-
-    TDateInput.value = ''
-    TDescriptInput.value = ''
-    TAmountInput.value = 0
-  }
+function addTransaction(TFormData: { date: string; description: string; amount: number }) {
+  const lastT = transactions.value.at(-1)
+  transactions.value.push({
+    id: lastT ? lastT.id + 1 : 1,
+    date: new Date(TFormData.date),
+    description: TFormData.description,
+    amount: TFormData.amount,
+  })
 }
 </script>
 
@@ -41,19 +32,7 @@ function addTransaction(date: string, description: string, amount: number) {
   <div>Solde : {{ solde }} €</div>
   <h2>Transactions</h2>
   <TransactionList :transactions="transactions" />
-  <form @submit.prevent="addTransaction(TDateInput, TDescriptInput, TAmountInput)">
-    <label for="TDateInput">Date de la transaction</label>
-    <input type="date" id="TDateInput" v-model="TDateInput" />
-
-    <label for="TDescriptInput">Description</label>
-    <input type="text" id="TDescriptInput" v-model="TDescriptInput" />
-
-    <label for="TAmountInput">Montant</label>
-    <input type="number" id="TAmountInput" v-model.number="TAmountInput" />
-
-    <input type="submit" value="Ajouter" />
-  </form>
-  <button>[ Ajouter une transaction ]</button>
+  <TransactionForm @submit="addTransaction" />
 </template>
 
 <style scoped></style>
