@@ -7,7 +7,7 @@ import TransactionForm, { type TransactionFormData } from './components/Transact
 
 const transactions = ref<Transaction[]>([])
 
-type TransactionResponse = Omit<Transaction, 'date'> & { date: string }
+type TransactionJSON = Omit<Transaction, 'date'> & { date: string }
 
 async function getTransactions() {
   try {
@@ -19,11 +19,11 @@ async function getTransactions() {
 
     const data = await response.json()
 
-    const resTransactions: TransactionResponse[] = data.transactions
+    const transactionResponse: TransactionJSON[] = data.transactions
 
-    transactions.value = resTransactions.map((transactionSTR) => ({
-      ...transactionSTR,
-      date: new Date(transactionSTR.date),
+    transactions.value = transactionResponse.map((transactionJSON) => ({
+      ...transactionJSON,
+      date: new Date(transactionJSON.date),
     }))
   } catch (err) {
     console.error('Error creating transactions GET:', err)

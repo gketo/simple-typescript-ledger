@@ -1,17 +1,13 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
-import type { Transaction } from '../src/types/Transaction.ts'
-
-const transactions = [
-  { id: 1, date: new Date(2026, 8, 1), description: 'Server', amount: 10 },
-  { id: 2, date: new Date(2026, 8, 2), description: 'Server1', amount: 100 },
-  { id: 3, date: new Date(2026, 8, 3), description: 'Server2', amount: -1000 },
-]
+import { DatabaseSync } from 'node:sqlite'
+const database = new DatabaseSync('./data/ledger.db')
 
 const PORT = 3000
 
 const fastify = Fastify()
+
 await fastify.register(cors, {
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'DELETE'],
@@ -22,24 +18,33 @@ fastify.get('/', async (request, reply) => {
 })
 
 fastify.get('/transaction', async (request, reply) => {
-  reply.send({ transactions })
+  const sqlQuery = database.prepare('SELECT * FROM transactions ORDER BY id')
+
+  reply.send({ transactions: sqlQuery.all() })
+
+  // sqlQuery.close()
 })
 
 fastify.post('/transaction', async (request, reply) => {
-  const transactionSTR = request.body
+  const transactionJSON = request.body
 
-  if (transactionSTR.date && transactionSTR.description && transactionSTR.amount !== 0) {
-    const lastT = transactions.at(-1)
+  if (transactionJSON.date && transactionJSON.description && transactionJSON.amount !== 0) {
+    const sqlInsert = database.prepare(
+      'INSERT INTO transactions (date, description, amount) VALUES (?, ?, ?)',
+    )
 
-    const newTransaction = {
-      ...transactionSTR,
-      id: lastT ? lastT.id + 1 : 1,
-      date: new Date(transactionSTR.date),
+    const { changes, lastInsertRowid } = sqlInsert.run(
+      transactionJSON.date,
+      transactionJSON.description,
+      transactionJSON.amount,
+    )
+    // sqlInsert.close()
+
+    if (changes === 1) {
+      reply.send({ ...transactionJSON, id: lastInsertRowid })
+    } else {
+      reply.code(400).send({ info: "sql error: couldn't insert transaction" })
     }
-
-    transactions.push(newTransaction)
-
-    reply.send(newTransaction)
   } else {
     reply
       .code(400)
@@ -50,14 +55,15 @@ fastify.post('/transaction', async (request, reply) => {
 fastify.delete('/transaction/:id', async (request, reply) => {
   const id = parseInt(request.params.id)
 
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].id === id) {
-      transactions.splice(i, 1)
-      reply.send({ deleted: true })
-      return
-    }
+  const sqlDelete = database.prepare('DELETE FROM transactions WHERE id = (?)')
+  const { changes } = sqlDelete.run(id)
+  // sqlDelete.close()
+
+  if (changes === 1) {
+    reply.send({ deleted: true })
+  } else {
+    reply.code(400).send({ info: `couldn't delete transaction: id ${id} not found` })
   }
-  reply.code(400).send({ info: `couldn't delete transaction: transaction with id ${id} not found` })
 })
 
 try {
