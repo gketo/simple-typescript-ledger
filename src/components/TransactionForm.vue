@@ -5,13 +5,13 @@ const TDateInput = ref('')
 const TDescriptInput = ref('')
 const TAmountInput = ref(0)
 
-type TFormData = {
+export type TransactionFormData = {
   date: string
   description: string
   amount: number
 }
 
-const emit = defineEmits<{ submit: [data: TFormData] }>()
+const emit = defineEmits<{ submit: [data: TransactionFormData] }>()
 
 function submitForm(date: string, description: string, amount: number) {
   if (date && description && amount !== 0) {

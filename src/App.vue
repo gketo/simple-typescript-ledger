@@ -3,19 +3,15 @@ import { computed, ref, onMounted } from 'vue'
 
 import type { Transaction } from '@/types/Transaction.ts'
 import TransactionList from './components/TransactionList.vue'
-import TransactionForm from './components/TransactionForm.vue'
+import TransactionForm, { type TransactionFormData } from './components/TransactionForm.vue'
 
-const transactions = ref<Transaction[]>([
-  // { id: 1, date: new Date(2026, 8, 15), description: 'Salaire', amount: 2000 },
-  // { id: 2, date: new Date(2026, 8, 14), description: 'Courses', amount: -80 },
-  // { id: 3, date: new Date(2026, 8, 12), description: 'Loyer', amount: -670 },
-])
+const transactions = ref<Transaction[]>([])
 
 type TransactionResponse = Omit<Transaction, 'date'> & { date: string }
 
 async function getTransactions() {
   try {
-    const response = await fetch('http://localhost:3000/transactions')
+    const response = await fetch('http://localhost:3000/transaction')
 
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`)
@@ -44,31 +40,58 @@ const solde = computed(() => {
   }, 0)
 })
 
-function addTransaction(TFormData: { date: string; description: string; amount: number }) {
-  const transaction = {
-    date: new Date(TFormData.date),
-    description: TFormData.description,
-    amount: TFormData.amount,
-  }
-  postTransaction(transaction)
+function addTransaction(tFormData: TransactionFormData) {
+  postAddTransaction(tFormData)
 }
 
-async function postTransaction(transaction: Omit<Transaction, 'id'>) {
+async function postAddTransaction(tFormData: TransactionFormData) {
   try {
-    const response = await fetch('http://localhost:3000/transactions', {
+    const response = await fetch('http://localhost:3000/transaction', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(transaction),
+      body: JSON.stringify(tFormData),
     })
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const createdTransaction: Transaction = await response.json()
-    console.log(createdTransaction)
+    const newTransaction = await response.json()
+    transactions.value.push({
+      ...newTransaction,
+      date: new Date(newTransaction.date),
+    })
+  } catch (err) {
+    console.error('Error creating transaction POST:', err)
+  }
+}
+
+type TransactionId = Transaction['id']
+
+function deleteTransaction(id: TransactionId) {
+  postDeleteTransaction(id)
+}
+
+async function postDeleteTransaction(id: TransactionId) {
+  try {
+    const response = await fetch(`http://localhost:3000/transaction/${id}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    // success
+    for (let i = 0; i < transactions.value.length; i++) {
+      const transaction = transactions.value[i]
+      if (transaction && transaction.id === id) {
+        transactions.value.splice(i, 1)
+        return
+      }
+    }
   } catch (err) {
     console.error('Error creating transaction POST:', err)
   }
@@ -79,7 +102,7 @@ async function postTransaction(transaction: Omit<Transaction, 'id'>) {
   <h1>Mon Ledger</h1>
   <div>Solde : {{ solde }} €</div>
   <h2>Transactions</h2>
-  <TransactionList :transactions="transactions" />
+  <TransactionList :transactions="transactions" @deleteTransaction="deleteTransaction" />
   <TransactionForm @submit="addTransaction" />
 </template>
 

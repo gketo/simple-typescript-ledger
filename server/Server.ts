@@ -14,17 +14,18 @@ const PORT = 3000
 const fastify = Fastify()
 await fastify.register(cors, {
   origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'DELETE'],
 })
 
 fastify.get('/', async (request, reply) => {
   reply.send({ message: '/ Welcome!' })
 })
 
-fastify.get('/transactions', async (request, reply) => {
+fastify.get('/transaction', async (request, reply) => {
   reply.send({ transactions })
 })
 
-fastify.post('/transactions', async (request, reply) => {
+fastify.post('/transaction', async (request, reply) => {
   const transactionSTR = request.body
 
   if (transactionSTR.date && transactionSTR.description && transactionSTR.amount !== 0) {
@@ -44,6 +45,19 @@ fastify.post('/transactions', async (request, reply) => {
       .code(400)
       .send({ info: "mandatory transaction's properties not filled, transaction not registered" })
   }
+})
+
+fastify.delete('/transaction/:id', async (request, reply) => {
+  const id = parseInt(request.params.id)
+
+  for (let i = 0; i < transactions.length; i++) {
+    if (transactions[i].id === id) {
+      transactions.splice(i, 1)
+      reply.send({ deleted: true })
+      return
+    }
+  }
+  reply.code(400).send({ info: `couldn't delete transaction: transaction with id ${id} not found` })
 })
 
 try {
