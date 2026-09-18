@@ -13,6 +13,12 @@ const isLoading = ref(false)
 
 const alertMsg = ref<string>('')
 
+async function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
 async function getTransactions() {
   try {
     isLoading.value = true
@@ -35,6 +41,8 @@ async function getTransactions() {
       date: new Date(transactionJSON.date),
     }))
   } catch (err) {
+    await sleep(1000)
+
     console.error('Error retrieving transactions GET:', err)
     alertMsg.value = 'Unable to connect to the server.'
   } finally {
@@ -116,7 +124,7 @@ async function postDeleteTransaction(id: TransactionId) {
       }
     }
   } catch (err) {
-    console.error('Error creating delete transaction POST:', err)
+    console.error('Error creating transaction DELETE:', err)
     alertMsg.value = 'An unexpected error occurred.'
   }
 }
