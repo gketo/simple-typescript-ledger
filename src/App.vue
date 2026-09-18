@@ -19,9 +19,9 @@ async function getTransactions() {
 
     const data = await response.json()
 
-    const transactionResponse: TransactionJSON[] = data.transactions
+    const transactionsJSON: TransactionJSON[] = data.transactions
 
-    transactions.value = transactionResponse.map((transactionJSON) => ({
+    transactions.value = transactionsJSON.map((transactionJSON) => ({
       ...transactionJSON,
       date: new Date(transactionJSON.date),
     }))
@@ -58,10 +58,11 @@ async function postAddTransaction(tFormData: TransactionFormData) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const newTransaction = await response.json()
+    const newTransactionJSON: TransactionJSON = await response.json()
+
     transactions.value.push({
-      ...newTransaction,
-      date: new Date(newTransaction.date),
+      ...newTransactionJSON,
+      date: new Date(newTransactionJSON.date),
     })
   } catch (err) {
     console.error('Error creating transaction POST:', err)
