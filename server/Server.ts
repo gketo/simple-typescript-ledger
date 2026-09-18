@@ -3,7 +3,7 @@ import cors from '@fastify/cors'
 
 import { DatabaseSync } from 'node:sqlite'
 
-async function sleep(ms) {
+async function sleep(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
@@ -28,7 +28,7 @@ fastify.get('/transaction', async (request, reply) => {
   try {
     const sqlQuery = database.prepare('SELECT * FROM transactions ORDER BY id')
 
-    await sleep(3000)
+    await sleep(1000)
 
     reply.send({ transactions: sqlQuery.all() })
     // sqlQuery.close()
