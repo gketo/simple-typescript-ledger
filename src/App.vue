@@ -9,12 +9,21 @@ const transactions = ref<Transaction[]>([])
 
 type TransactionJSON = Omit<Transaction, 'date'> & { date: string }
 
+const isLoading = ref(false)
+
+const alertMsg = ref<string>('')
+
 async function getTransactions() {
   try {
+    isLoading.value = true
+
     const response = await fetch('http://localhost:3000/transaction')
 
     if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`)
+      if (response.status === 500) {
+        alertMsg.value = 'An error occurred while retrieving the transaction.'
+      }
+      return
     }
 
     const data = await response.json()
@@ -26,7 +35,10 @@ async function getTransactions() {
       date: new Date(transactionJSON.date),
     }))
   } catch (err) {
-    console.error('Error creating transactions GET:', err)
+    console.error('Error retrieving transactions GET:', err)
+    alertMsg.value = 'Unable to connect to the server.'
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -55,7 +67,15 @@ async function postAddTransaction(tFormData: TransactionFormData) {
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      if (response.status === 400) {
+        alertMsg.value = 'Required transaction fields are missing.'
+      } else if (response.status === 500) {
+        alertMsg.value = 'An error occurred while creating the transaction.'
+      } else {
+        alertMsg.value = 'An unexpected error occurred.'
+      }
+
+      return
     }
 
     const newTransactionJSON: TransactionJSON = await response.json()
@@ -66,6 +86,7 @@ async function postAddTransaction(tFormData: TransactionFormData) {
     })
   } catch (err) {
     console.error('Error creating transaction POST:', err)
+    alertMsg.value = 'Unable to connect to the server.'
   }
 }
 
@@ -82,7 +103,8 @@ async function postDeleteTransaction(id: TransactionId) {
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      alertMsg.value = 'An unexpected error occurred.'
+      return
     }
 
     // success
@@ -94,7 +116,8 @@ async function postDeleteTransaction(id: TransactionId) {
       }
     }
   } catch (err) {
-    console.error('Error creating transaction POST:', err)
+    console.error('Error creating delete transaction POST:', err)
+    alertMsg.value = 'An unexpected error occurred.'
   }
 }
 </script>
@@ -103,8 +126,18 @@ async function postDeleteTransaction(id: TransactionId) {
   <h1>Mon Ledger</h1>
   <div>Solde : {{ solde }} €</div>
   <h2>Transactions</h2>
-  <TransactionList :transactions="transactions" @deleteTransaction="deleteTransaction" />
-  <TransactionForm @submit="addTransaction" />
+  <div v-show="isLoading">Chargement en cours...</div>
+  <TransactionList
+    v-show="!isLoading"
+    :transactions="transactions"
+    @deleteTransaction="deleteTransaction"
+  />
+  <TransactionForm
+    v-show="!isLoading"
+    @submit="addTransaction"
+    @validationError="alertMsg = $event"
+  />
+  <div v-show="alertMsg.length"><button @click="alertMsg = ''">&times;</button>{{ alertMsg }}</div>
 </template>
 
 <style scoped></style>

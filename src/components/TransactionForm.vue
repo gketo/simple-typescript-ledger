@@ -11,7 +11,10 @@ export type TransactionFormData = {
   amount: number
 }
 
-const emit = defineEmits<{ submit: [data: TransactionFormData] }>()
+const emit = defineEmits<{
+  submit: [data: TransactionFormData]
+  validationError: [message: string]
+}>()
 
 function submitForm(date: string, description: string, amount: number) {
   if (date && description && amount !== 0) {
@@ -20,13 +23,13 @@ function submitForm(date: string, description: string, amount: number) {
       description,
       amount,
     })
+    TDateInput.value = ''
+    TDescriptInput.value = ''
+    TAmountInput.value = 0
   } else {
     console.warn('Invalid submit event transaction!')
+    emit('validationError', 'Required transaction fields are missing')
   }
-
-  TDateInput.value = ''
-  TDescriptInput.value = ''
-  TAmountInput.value = 0
 }
 </script>
 

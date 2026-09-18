@@ -2,6 +2,13 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
 import { DatabaseSync } from 'node:sqlite'
+
+async function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
 const database = new DatabaseSync('./data/ledger.db')
 
 const PORT = 3000
@@ -18,11 +25,18 @@ fastify.get('/', async (request, reply) => {
 })
 
 fastify.get('/transaction', async (request, reply) => {
-  const sqlQuery = database.prepare('SELECT * FROM transactions ORDER BY id')
+  try {
+    const sqlQuery = database.prepare('SELECT * FROM transactions ORDER BY id')
 
-  reply.send({ transactions: sqlQuery.all() })
+    await sleep(3000)
 
-  // sqlQuery.close()
+    reply.send({ transactions: sqlQuery.all() })
+    // sqlQuery.close()
+  } catch (error) {
+    reply.code(500).send({
+      info: 'An error occurred while retrieving transactions.',
+    })
+  }
 })
 
 fastify.post('/transaction', async (request, reply) => {
@@ -43,12 +57,10 @@ fastify.post('/transaction', async (request, reply) => {
     if (changes === 1) {
       reply.send({ ...transactionJSON, id: lastInsertRowid })
     } else {
-      reply.code(400).send({ info: "sql error: couldn't insert transaction" })
+      reply.code(500).send({ info: 'An error occurred while creating the transaction.' })
     }
   } else {
-    reply
-      .code(400)
-      .send({ info: "mandatory transaction's properties not filled, transaction not registered" })
+    reply.code(400).send({ info: 'Required transaction fields are missing' })
   }
 })
 
@@ -62,7 +74,7 @@ fastify.delete('/transaction/:id', async (request, reply) => {
   if (changes === 1) {
     reply.send({ deleted: true })
   } else {
-    reply.code(400).send({ info: `couldn't delete transaction: id ${id} not found` })
+    reply.code(404).send({ info: `Transaction with ID ${id} was not found.` })
   }
 })
 
