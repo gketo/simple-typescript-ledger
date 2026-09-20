@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { CreateTransactionInput } from '@/types/Transaction'
+
 const TDateInput = ref('')
 const TDescriptInput = ref('')
 const TAmountInput = ref(0)
 
-export type TransactionFormData = {
-  date: string
-  description: string
-  amount: number
-}
-
 const emit = defineEmits<{
-  submit: [data: TransactionFormData]
+  submit: [data: CreateTransactionInput]
   validationError: [message: string]
 }>()
 

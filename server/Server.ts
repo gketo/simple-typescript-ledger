@@ -72,7 +72,7 @@ fastify.delete('/transaction/:id', async (request, reply) => {
   // sqlDelete.close()
 
   if (changes === 1) {
-    reply.send({ deleted: true })
+    reply.send(id)
   } else {
     reply.code(404).send({ info: `Transaction with ID ${id} was not found.` })
   }
