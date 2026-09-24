@@ -1,7 +1,7 @@
 import type { Transaction, TransactionJSON, CreateTransactionInput } from '@/types/Transaction'
 
 export async function createTransaction(transaction: CreateTransactionInput): Promise<Transaction> {
-  const response = await fetch('http://localhost:3000/transaction', {
+  const response = await fetch('http://localhost:3000/transactions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export async function createTransaction(transaction: CreateTransactionInput): Pr
 }
 
 export async function removeTransaction(id: number): Promise<number> {
-  const response = await fetch(`http://localhost:3000/transaction/${id}`, {
+  const response = await fetch(`http://localhost:3000/transactions/${id}`, {
     method: 'DELETE',
   })
 
@@ -34,7 +34,7 @@ export async function removeTransaction(id: number): Promise<number> {
 }
 
 export async function fetchTransactions(): Promise<Transaction[]> {
-  const response = await fetch('http://localhost:3000/transaction')
+  const response = await fetch('http://localhost:3000/transactions')
 
   if (!response.ok) {
     throw response.status
