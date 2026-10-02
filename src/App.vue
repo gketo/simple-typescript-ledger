@@ -1,25 +1,27 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 
-import type { Transaction, TransactionJSON, CreateTransactionInput } from '@/types/Transaction.ts'
+import type { Transaction, NewTransactionInput, TransactionId } from '@/types/Transaction.ts'
 
 import TransactionList from './components/TransactionList.vue'
 import TransactionForm from './components/TransactionForm.vue'
 
-import {
-  createTransaction,
-  fetchTransactions,
-  removeTransaction,
-} from './services/transactionServices.ts'
+import { createTransaction, fetchTransactions, removeTransaction } from './services/transactions.ts'
+import type { Category, Subcategory } from './types/Category.ts'
+import { fetchCategories, fetchSubcategories } from './services/categories.ts'
 
 const alertMsg = ref<string>('')
 
 const transactions = ref<Transaction[]>([])
+const categories = ref<Category[]>([])
+const subcategories = ref<Subcategory[]>([])
 
 const isLoading = ref(false)
 
 onMounted(() => {
   loadTransactions()
+  loadCategories()
+  loadSubcategories()
 })
 
 const solde = computed(() => {
@@ -28,7 +30,7 @@ const solde = computed(() => {
   }, 0)
 })
 
-async function addTransaction(tFormData: CreateTransactionInput) {
+async function addTransaction(tFormData: NewTransactionInput) {
   try {
     const added: Transaction = await createTransaction(tFormData)
     transactions.value.push(added)
@@ -41,8 +43,6 @@ async function addTransaction(tFormData: CreateTransactionInput) {
     }
   }
 }
-
-type TransactionId = Transaction['id']
 
 async function deleteTransaction(id: TransactionId) {
   try {
@@ -73,6 +73,32 @@ async function loadTransactions() {
     isLoading.value = false
   }
 }
+
+async function loadCategories() {
+  try {
+    isLoading.value = true
+    categories.value = await fetchCategories()
+  } catch (err) {
+    // await sleep(1000)
+    console.error('Error retrieving categories:', err)
+    alertMsg.value = 'Unable to retrieve categories. Please try again later.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function loadSubcategories() {
+  try {
+    isLoading.value = true
+    subcategories.value = await fetchSubcategories()
+  } catch (err) {
+    // await sleep(1000)
+    console.error('Error retrieving subcategories:', err)
+    alertMsg.value = 'Unable to retrieve subcategories. Please try again later.'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -80,13 +106,11 @@ async function loadTransactions() {
   <div>Solde : {{ solde }} €</div>
   <h2>Transactions</h2>
   <div v-show="isLoading">Chargement en cours...</div>
-  <TransactionList
-    v-show="!isLoading"
-    :transactions="transactions"
-    @deleteTransaction="deleteTransaction"
-  />
+  <TransactionList v-show="!isLoading" :transactions="transactions" @delete="deleteTransaction" />
   <TransactionForm
     v-show="!isLoading"
+    :categories="categories"
+    :subcategories="subcategories"
     @submit="addTransaction"
     @validationError="alertMsg = $event"
   />

@@ -1,6 +1,6 @@
-import type { Transaction, TransactionJSON, CreateTransactionInput } from '@/types/Transaction'
+import type { NewTransactionInput, TransactionId, Transaction } from '@/types/Transaction'
 
-export async function createTransaction(transaction: CreateTransactionInput): Promise<Transaction> {
+export async function createTransaction(transaction: NewTransactionInput): Promise<Transaction> {
   const response = await fetch('http://localhost:3000/transactions', {
     method: 'POST',
     headers: {
@@ -13,15 +13,15 @@ export async function createTransaction(transaction: CreateTransactionInput): Pr
     throw response.status
   }
 
-  const newTransactionJSON: TransactionJSON = await response.json()
+  const newTransaction: Transaction = await response.json()
 
   return {
-    ...newTransactionJSON,
-    date: new Date(newTransactionJSON.date),
+    ...newTransaction,
+    date: new Date(newTransaction.date),
   }
 }
 
-export async function removeTransaction(id: number): Promise<number> {
+export async function removeTransaction(id: TransactionId): Promise<TransactionId> {
   const response = await fetch(`http://localhost:3000/transactions/${id}`, {
     method: 'DELETE',
   })
@@ -30,7 +30,8 @@ export async function removeTransaction(id: number): Promise<number> {
     throw response.status
   }
 
-  return id
+  const data = await response.json()
+  return data.id
 }
 
 export async function fetchTransactions(): Promise<Transaction[]> {
@@ -42,7 +43,7 @@ export async function fetchTransactions(): Promise<Transaction[]> {
 
   const data = await response.json()
 
-  const transactionsJSON: TransactionJSON[] = data.transactions
+  const transactionsJSON: Transaction[] = data.transactions
 
   const transactions = transactionsJSON.map((transactionJSON) => ({
     ...transactionJSON,
