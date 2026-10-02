@@ -1,3 +1,9 @@
+INSERT INTO accounts (name)
+VALUES
+('Compte Courant'),
+('Compte Pro');
+
+
 INSERT INTO transactions (
     date,
     category_id,
@@ -5,7 +11,7 @@ INSERT INTO transactions (
     description,
     payee,
     amount,
-    account,
+    account_id,
     has_invoice
 )
 VALUES
@@ -16,7 +22,7 @@ VALUES
     'Abonnement hébergement annuel',
     'OVH',
     89.00,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
 (
@@ -26,7 +32,7 @@ VALUES
     'Plein de carburant',
     'TotalEnergies',
     72.50,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
 (
@@ -36,7 +42,7 @@ VALUES
     'Écran professionnel',
     'Dell',
     349.99,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
 (
@@ -46,7 +52,7 @@ VALUES
     'Cotisations sociales',
     'URSSAF',
     1250.00,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
 (
@@ -56,7 +62,7 @@ VALUES
     'Abonnement Internet',
     'Orange',
     39.99,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
 (
@@ -66,7 +72,7 @@ VALUES
     'Péage déplacement client',
     'Vinci Autoroutes',
     14.80,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Pro'),
     0
 ),
 (
@@ -76,6 +82,6 @@ VALUES
     'Rémunération septembre',
     NULL,
     1800.00,
-    'Compte courant',
+    (SELECT id FROM accounts WHERE name = 'Compte Pro'),
     0
 );
