@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 
 import { transactionRoutes } from './routes/transactions.ts'
 import { categoryRoutes } from './routes/categories.ts'
+import { accountRoutes } from './routes/accounts.ts'
 
 // listening port
 const PORT = 3000
@@ -20,6 +21,8 @@ await fastify.register(cors, {
 fastify.register(transactionRoutes)
 // category routes
 fastify.register(categoryRoutes)
+// accounts routes
+fastify.register(accountRoutes)
 
 // todo useless
 fastify.get('/', async (request, reply) => {

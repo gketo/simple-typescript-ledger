@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 
-import { isValidTransaction, type NewTransactionInput } from '../../src/types/Transaction.ts'
+import { isValidTransaction, type NewTransactionInput } from '../../src/types/Transaction'
 
 import {
   dbGetTransactions,
   dbCreateTransaction,
   dbDeleteTransaction,
-} from '../services/transaction-database.ts'
+} from '../services/transaction-database'
 
 export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.get('/transactions', async (request, reply) => {
@@ -26,26 +26,26 @@ export async function transactionRoutes(fastify: FastifyInstance) {
   })
 
   // todo impodency key with periodic cleaninc in separate table
-  fastify.post(
+  fastify.post<{ Body: NewTransactionInput }>(
     '/transactions',
     {
       schema: {
         body: {
           type: 'object',
-          required: ['date', 'categoryId', 'description', 'amount', 'account', 'hasInvoice'],
+          required: ['date', 'categoryId', 'description', 'amount', 'accountId', 'hasInvoice'],
           properties: {
             date: { type: 'string' },
-            categoryId: { type: 'number' },
+            categoryId: { type: 'integer' },
             description: { type: 'string' },
             amount: { type: 'number' },
-            account: { type: 'number' },
+            accountId: { type: 'integer' },
             hasInvoice: { type: 'boolean' },
           },
         },
       },
     },
     async (request, reply) => {
-      const input: NewTransactionInput = request.body
+      const input: NewTransactionInput = request.body // as NewTransactionInput
 
       if (isValidTransaction(input)) {
         try {
@@ -77,7 +77,11 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
   )
 
-  fastify.delete(
+  type TransactionParams = {
+    id: string
+  }
+
+  fastify.delete<{ Params: TransactionParams }>(
     '/transactions/:id',
     {
       schema: {
@@ -98,14 +102,23 @@ export async function transactionRoutes(fastify: FastifyInstance) {
 
         reply.code(200).send({ id })
       } catch (err) {
-        reply.code(404).send({
-          error: {
-            code: 'ID_NOT_FOUND',
-            message: "Transaction not found. Couldn't delete",
-            details: `Transaction with id ${err.id} does not exist`,
-            field: '',
-          },
-        })
+        if (err instanceof Error) {
+          reply.code(404).send({
+            error: {
+              code: 'ID_NOT_FOUND',
+              message: "Transaction not found. Couldn't delete",
+              details: err.message,
+              field: '',
+            },
+          })
+        } else {
+          reply.code(500).send({
+            error: {
+              code: 'INTERNAL_ERROR',
+              message: 'Unexpected error',
+            },
+          })
+        }
       }
     },
   )

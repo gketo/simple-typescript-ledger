@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 
-import type { Transaction, NewTransactionInput, TransactionId } from '@/types/Transaction.ts'
-
 import TransactionList from './components/TransactionList.vue'
 import TransactionForm from './components/TransactionForm.vue'
 
-import { createTransaction, fetchTransactions, removeTransaction } from './services/transactions.ts'
+import type { Transaction, NewTransactionInput, TransactionId } from '@/types/Transaction.ts'
 import type { Category, Subcategory } from './types/Category.ts'
+import type { Account } from './types/Account.ts'
+
+import { createTransaction, fetchTransactions, removeTransaction } from './services/transactions.ts'
 import { fetchCategories, fetchSubcategories } from './services/categories.ts'
+import { fetchAccounts } from './services/accounts.ts'
 
 const alertMsg = ref<string>('')
 
 const transactions = ref<Transaction[]>([])
 const categories = ref<Category[]>([])
 const subcategories = ref<Subcategory[]>([])
+const accounts = ref<Account[]>([])
 
 const isLoading = ref(false)
 
@@ -22,6 +25,7 @@ onMounted(() => {
   loadTransactions()
   loadCategories()
   loadSubcategories()
+  loadAccounts()
 })
 
 const solde = computed(() => {
@@ -99,6 +103,19 @@ async function loadSubcategories() {
     isLoading.value = false
   }
 }
+
+async function loadAccounts() {
+  try {
+    isLoading.value = true
+    accounts.value = await fetchAccounts()
+  } catch (err) {
+    // await sleep(1000)
+    console.error('Error retrieving accounts:', err)
+    alertMsg.value = 'Unable to retrieve accounts. Please try again later.'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -111,6 +128,7 @@ async function loadSubcategories() {
     v-show="!isLoading"
     :categories="categories"
     :subcategories="subcategories"
+    :accounts="accounts"
     @submit="addTransaction"
     @validationError="alertMsg = $event"
   />

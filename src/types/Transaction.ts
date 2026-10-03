@@ -1,4 +1,5 @@
 import { type Category, type CategoryId, type Subcategory, type SubcategoryId } from './Category.ts'
+import type { Account, AccountId } from './Account.ts'
 
 export interface Transaction {
   id: number
@@ -8,7 +9,7 @@ export interface Transaction {
   description: string
   payee?: string
   amount: number
-  account: string
+  account: Account
   hasInvoice: boolean
 }
 
@@ -16,9 +17,13 @@ export type TransactionId = Transaction['id']
 
 export type TransactionAsJSON = Omit<Transaction, 'date'> & { date: string }
 
-export type NewTransactionInput = Omit<TransactionAsJSON, 'id' | 'category' | 'subcategory'> & {
+export type NewTransactionInput = Omit<
+  TransactionAsJSON,
+  'id' | 'category' | 'subcategory' | 'account'
+> & {
   categoryId: CategoryId | undefined
   subcategoryId: SubcategoryId | undefined
+  accountId: AccountId | undefined
 }
 
 export function createEmptyTransactionInput(): NewTransactionInput {
@@ -28,7 +33,7 @@ export function createEmptyTransactionInput(): NewTransactionInput {
     subcategoryId: undefined,
     description: '',
     amount: 0,
-    account: '',
+    accountId: undefined,
     hasInvoice: false,
   }
 }
@@ -39,6 +44,6 @@ export function isValidTransaction(transaction: NewTransactionInput): boolean {
     transaction.categoryId !== undefined &&
     transaction.description.length > 0 &&
     transaction.amount !== 0 &&
-    transaction.account.length > 0
+    transaction.accountId !== undefined
   )
 }

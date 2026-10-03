@@ -8,10 +8,15 @@ import {
 } from '@/types/Transaction'
 
 import type { Category, Subcategory } from '@/types/Category'
+import type { Account } from '@/types/Account'
 
 const form = ref(createEmptyTransactionInput())
 
-const props = defineProps<{ categories: Category[]; subcategories: Subcategory[] }>()
+const props = defineProps<{
+  categories: Category[]
+  subcategories: Subcategory[]
+  accounts: Account[]
+}>()
 
 const emit = defineEmits<{
   submit: [data: NewTransactionInput]
@@ -70,7 +75,11 @@ const subcategoriesFiltered = computed(() => {
     <input type="number" id="amount" name="amount" v-model.number="form.amount" />
 
     <label for="account">Compte</label>
-    <select id="account" name="account" v-model="form.account"></select>
+    <select id="account" name="account" v-model="form.accountId">
+      <option v-for="account in accounts" :value="account.id">
+        {{ account.name }}
+      </option>
+    </select>
 
     <label for="hasInvoice">Facture?</label>
     <input
