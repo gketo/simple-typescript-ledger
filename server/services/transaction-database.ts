@@ -1,34 +1,87 @@
 import { DatabaseSync } from 'node:sqlite'
 
-const database = new DatabaseSync('./database/ledger.db')
+import type { Transaction, NewTransactionInput, TransactionId } from '../../src/types/Transaction'
 
-import type {
-  Transaction,
-  NewTransactionInput,
-  TransactionId,
-} from '../../src/types/Transaction.ts'
-
-export function dbGetTransactions(): Transaction[] {
-  const sqlQuery = database.prepare(`
-    SELECT 
-      t.*,
-      c.name as category,
-      sc.name as subcategory
-    FROM transactions t 
-      LEFT JOIN categories c
-        ON t.category_id = c.id
-      LEFT JOIN subcategories sc 
-        ON t.subcategory_id = sc.id 
-    ORDER BY date
-  `)
-
-  const data = sqlQuery.all()
-
-  return data
+type SQLTransaction = {
+  id: number
+  date: Date
+  category: string
+  subcategory: string | null
+  description: string
+  payee: string | null
+  amount: number
+  account: string
+  has_invoice: number
 }
 
-export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
-  const sqlInsert = database.prepare(`
+const database = new DatabaseSync('./database/ledger.db')
+
+const queryTransactions = database.prepare(
+  `
+    SELECT 
+      trans.id,
+      trans.date,
+      trans.description,
+      trans.payee,
+      trans.amount,
+      trans.has_invoice,
+      json_object(
+        'id', cat.id, 
+        'name', cat.name
+      ) as category,
+      CASE 
+        WHEN trans.subcategory_id IS NULL
+          THEN NULL
+        ELSE
+          json_object(
+            'id', subcat.id, 
+            'name', subcat.name
+          ) 
+      END subcategory,
+      json_object(
+        'id', acc.id, 
+        'name', acc.name
+      ) as account
+    FROM transactions trans
+      LEFT JOIN categories cat
+        ON trans.category_id = cat.id
+      LEFT JOIN subcategories subcat
+        ON trans.subcategory_id = subcat.id
+      LEFT JOIN accounts acc 
+        ON trans.account_id = acc.id 
+    ORDER BY date
+  `,
+)
+
+export function dbGetTransactions(): Transaction[] {
+  const data = queryTransactions.all() as unknown as SQLTransaction[]
+
+  const transactions: Transaction[] = data.map((transactionSql) => {
+    const temp: Transaction = {
+      id: transactionSql.id,
+      date: new Date(transactionSql.date),
+      category: JSON.parse(transactionSql.category),
+      description: transactionSql.description,
+      amount: transactionSql.amount,
+      account: JSON.parse(transactionSql.account),
+      hasInvoice: transactionSql.has_invoice ? true : false,
+    }
+
+    if (transactionSql.subcategory !== null) {
+      temp.subcategory = JSON.parse(transactionSql.subcategory)
+    }
+    if (transactionSql.payee !== null) {
+      temp.payee = transactionSql.payee
+    }
+
+    return temp
+  })
+
+  return transactions
+}
+
+const insertTransaction = database.prepare(
+  `
     INSERT INTO
       transactions (
         date, 
@@ -42,12 +95,14 @@ export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
       )
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?)
-  `)
+  `,
+)
 
+export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
   if (input.categoryId === undefined) {
     throw new Error('Category is required')
   } else {
-    const { changes, lastInsertRowid } = sqlInsert.run(
+    const { changes, lastInsertRowid } = insertTransaction.run(
       input.date,
       input.categoryId,
       input.subcategoryId ?? null,
@@ -57,23 +112,26 @@ export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
       input.accountId ?? null,
       input.hasInvoice ? 1 : 0,
     )
+
     if (changes !== 1) {
-      throw new Error('Database new transaction insert failed')
+      throw new Error('Database: Error inserting new transaction')
     }
 
     return Number(lastInsertRowid)
   }
 }
 
-export function dbDeleteTransaction(id: TransactionId) {
-  const sqlDelete = database.prepare(`
+const deleteTransaction = database.prepare(
+  `
     DELETE FROM 
       transactions 
     WHERE 
       id = (?)
-  `)
+  `,
+)
 
-  const { changes } = sqlDelete.run(id)
+export function dbDeleteTransaction(id: TransactionId) {
+  const { changes } = deleteTransaction.run(id)
 
   if (changes !== 1) {
     throw id

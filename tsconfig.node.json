@@ -2,6 +2,7 @@
 {
   "extends": "@tsconfig/node24/tsconfig.json",
   "include": [
+    "test/**/*.ts", // modified here
     "server/**/*.ts", // modified here
     "vite.config.*",
     "vitest.config.*",

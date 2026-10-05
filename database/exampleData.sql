@@ -68,7 +68,8 @@ VALUES
 (
     '2026-09-12',
     (SELECT id FROM categories WHERE name = 'Déplacements'),
-    (SELECT id FROM subcategories WHERE name = 'Péages'),
+    -- (SELECT id FROM subcategories WHERE name = 'Péages'),
+    NULL,
     'Péage déplacement client',
     'Vinci Autoroutes',
     14.80,
@@ -78,7 +79,8 @@ VALUES
 (
     '2026-09-15',
     (SELECT id FROM categories WHERE name = 'Rémunération'),
-    (SELECT id FROM subcategories WHERE name = 'Rémunération personnelle'),
+    -- (SELECT id FROM subcategories WHERE name = 'Rémunération personnelle'),
+    NULL,
     'Rémunération septembre',
     NULL,
     1800.00,

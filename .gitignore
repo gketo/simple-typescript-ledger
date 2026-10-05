@@ -143,4 +143,7 @@ vite.config.ts.timestamp-*
 .vite/
 
 # SQLite Databases
-data/*.db
+# database/*.db
+
+# Test files
+test/*
