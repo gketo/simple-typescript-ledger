@@ -15,12 +15,11 @@ export interface Transaction {
 
 export type TransactionId = Transaction['id']
 
-export type JSONTransaction = Omit<Transaction, 'date'> & { date: string }
-
 export type NewTransactionInput = Omit<
-  JSONTransaction,
-  'id' | 'category' | 'subcategory' | 'account'
+  Transaction,
+  'id' | 'date' | 'category' | 'subcategory' | 'account'
 > & {
+  date: string
   categoryId: CategoryId | undefined
   subcategoryId: SubcategoryId | undefined
   accountId: AccountId | undefined
