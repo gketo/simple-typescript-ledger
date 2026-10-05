@@ -1,33 +1,31 @@
-import { DatabaseSync } from 'node:sqlite'
-
-const database = new DatabaseSync('./database/ledger.db')
+import { database } from './database'
 
 import type { Category, Subcategory } from '../../src/types/Category'
 
-export function dbGetCategories(): Category[] {
-  const sqlQuery = database.prepare(`
+const queryCategories = database.prepare(
+  `
     SELECT 
       *
     FROM
       categories
-  `)
+  `,
+)
 
-  const data = sqlQuery.all() as Category[]
-
-  return data
+export function dbGetCategories(): Category[] {
+  return queryCategories.all() as unknown as Category[]
 }
 
-export function dbGetSubcategories(): Subcategory[] {
-  const sqlQuery = database.prepare(`
+const querySubcategories = database.prepare(
+  `
     SELECT 
       id,
       name,
       category_id AS categoryId
     FROM
       subcategories
-  `)
+  `,
+)
 
-  const data = sqlQuery.all() as Subcategory[]
-
-  return data
+export function dbGetSubcategories(): Subcategory[] {
+  return querySubcategories.all() as unknown as Subcategory[]
 }

@@ -1,16 +1,18 @@
-import { DatabaseSync } from 'node:sqlite'
+import { database } from './database'
 
-const database = new DatabaseSync('./database/ledger.db')
+import { Account } from '../../src/types/Account'
 
-export function dbGetAccounts(): Account[] {
-  const sqlQuery = database.prepare(`
+const queryAccounts = database.prepare(
+  `
     SELECT 
       *
     FROM
       accounts
-  `)
+  `,
+)
 
-  const data = sqlQuery.all() as Account[]
+export function dbGetAccounts(): Account[] {
+  const data = queryAccounts.all() as unknown as Account[]
 
   return data
 }

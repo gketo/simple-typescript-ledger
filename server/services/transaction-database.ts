@@ -1,20 +1,18 @@
-import { DatabaseSync } from 'node:sqlite'
+import { database } from './database'
 
 import type { Transaction, NewTransactionInput, TransactionId } from '../../src/types/Transaction'
 
 type SQLTransaction = {
   id: number
-  date: Date
+  date: string
   category: string
   subcategory: string | null
   description: string
   payee: string | null
   amount: number
   account: string
-  has_invoice: number
+  hasInvoice: number
 }
-
-const database = new DatabaseSync('./database/ledger.db')
 
 const queryTransactions = database.prepare(
   `
@@ -24,7 +22,7 @@ const queryTransactions = database.prepare(
       trans.description,
       trans.payee,
       trans.amount,
-      trans.has_invoice,
+      trans.has_invoice AS hasInvoice,
       json_object(
         'id', cat.id, 
         'name', cat.name
@@ -64,7 +62,7 @@ export function dbGetTransactions(): Transaction[] {
       description: transactionSql.description,
       amount: transactionSql.amount,
       account: JSON.parse(transactionSql.account),
-      hasInvoice: transactionSql.has_invoice ? true : false,
+      hasInvoice: transactionSql.hasInvoice === 1,
     }
 
     if (transactionSql.subcategory !== null) {
