@@ -50,7 +50,9 @@ const formData = props.editMode.active
   ? ref(createFormTransaction(props.editMode.transaction))
   : ref(createFormTransaction())
 
-const amount = ref<number>(0)
+const amount = props.editMode.active
+  ? ref(props.editMode.transaction.amountInCents / 100)
+  : ref<number>(0)
 
 function submitForm(transaction: TransactionFormData) {
   if (
@@ -78,18 +80,20 @@ const subcategoriesFiltered = computed(() => {
 
 <template>
   <form @submit.prevent="submitForm(formData)">
-    <label for="date">Date</label>
-    <input type="date" id="date" name="date" v-model="formData.date" />
+    <input type="date" aria-label="date" id="date" name="date" v-model="formData.date" />
 
-    <label for="categoryId">Catégorie</label>
-    <select id="categoryId" name="categoryId" v-model="formData.category">
+    <select aria-label="Category" id="categoryId" name="categoryId" v-model="formData.category">
       <option v-for="category in props.categories" :value="category" :key="category.id">
         {{ category.name }}
       </option>
     </select>
 
-    <label for="subcategoryId">Sous-catégorie</label>
-    <select id="subcategoryId" name="subcategoryId" v-model="formData.subcategory">
+    <select
+      aria-label="Subcategory"
+      id="subcategoryId"
+      name="subcategoryId"
+      v-model="formData.subcategory"
+    >
       <option :key="undefined">Aucune</option>
       <option
         v-for="subcategory in subcategoriesFiltered"
@@ -100,35 +104,43 @@ const subcategoriesFiltered = computed(() => {
       </option>
     </select>
 
-    <label for="description">Description</label>
     <input
       type="text"
+      aria-label="Description"
       id="description"
       name="description"
       v-model="formData.description"
-      placeholder="Remplir ici"
+      placeholder="Ex.: Nom de domaine"
     />
 
-    <label for="amount">Montant</label>
+    <input
+      type="text"
+      aria-label="Payee"
+      id="payee"
+      name="payee"
+      v-model="formData.payee"
+      placeholder="Ex.: OVH Cloud"
+    />
+
     <input
       type="number"
       step="0.01"
+      aria-label="Amount"
       placeholder="0.00"
       id="amount"
       name="amount"
       v-model.number="amount"
     />
 
-    <label for="account">Compte</label>
-    <select id="account" name="account" v-model="formData.account">
+    <select aria-label="Account" id="account" name="account" v-model="formData.account">
       <option v-for="account in accounts" :value="account" :key="account.id">
         {{ account.name }}
       </option>
     </select>
 
-    <label for="hasInvoice">Facture?</label>
     <input
       type="checkbox"
+      aria-label="Invoice"
       id="hasInvoice"
       name="hasInvoice"
       value="hasInvoice"

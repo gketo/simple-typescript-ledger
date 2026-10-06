@@ -57,6 +57,8 @@ function onUpdatingError(id: TransactionId, eventData: string) {
     <tbody>
       <tr v-for="transaction in props.transactions" :key="transaction.id">
         <template v-if="isBeingModified.has(transaction.id)">
+          <td></td>
+          <td></td>
           <td colspan="10">
             <TransactionForm
               :editMode="{ active: true, transaction: transaction }"
