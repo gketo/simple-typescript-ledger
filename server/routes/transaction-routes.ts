@@ -32,7 +32,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       schema: {
         body: {
           type: 'object',
-          required: ['date', 'categoryId', 'description', 'amount', 'accountId', 'hasInvoice'],
+          required: ['date', 'category', 'description', 'amount', 'account', 'hasInvoice'],
           properties: {
             date: { type: 'string' },
             categoryId: { type: 'integer' },
@@ -45,7 +45,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const input: NewTransactionInput = request.body // as NewTransactionInput
+      const input: NewTransactionInput = request.body
 
       if (isValidTransaction(input)) {
         try {

@@ -101,17 +101,17 @@ const insertTransaction = database.prepare(
 )
 
 export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
-  if (input.categoryId === undefined) {
+  if (input.category === undefined) {
     throw new Error('Category is required')
   } else {
     const { changes, lastInsertRowid } = insertTransaction.run(
       input.date,
-      input.categoryId,
-      input.subcategoryId ?? null,
+      input.category.id,
+      input.subcategory ? input.subcategory.id : null,
       input.description,
       input.payee ?? null,
       input.amount,
-      input.accountId ?? null,
+      input.account ? input.account.id : null,
       input.hasInvoice ? 1 : 0,
     )
 
