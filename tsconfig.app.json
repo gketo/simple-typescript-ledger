@@ -1,0 +1,38 @@
+// {
+//   "compilerOptions": {
+//     "target": "ES2022",
+//     "module": "ESNext",
+//     "moduleResolution": "Bundler",
+
+//     "strict": true,
+//     "skipLibCheck": true,
+
+//     "jsx": "preserve",
+//     "allowJs": false,
+
+//     "types": ["vite/client"],
+
+//     "paths": {
+//       "@/*": ["./src/*"],
+//       "@shared/*": ["./shared/*"]
+//     }
+//   },
+//   "include": ["src/**/*.ts", "src/**/*.vue", "shared/**/*.ts"]
+// }
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+
+    "allowImportingTsExtensions": true,
+
+    "types": ["vite/client"],
+
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["./shared/*"]
+    }
+  },
+  "include": ["env.d.ts", "src/**/*.ts", "src/**/*.vue", "shared/**/*.ts"]
+}

@@ -4,13 +4,9 @@ import { computed, ref, onMounted } from 'vue'
 import TransactionList from './components/TransactionList.vue'
 import TransactionForm from './components/TransactionForm.vue'
 
-import type {
-  Transaction,
-  NewTransactionInput,
-  TransactionId,
-} from '../../shared/types//Transaction.ts'
-import type { Category, Subcategory } from './types/Category.ts'
-import type { Account } from './types/Account.ts'
+import type { Transaction, NewTransactionInput, TransactionId } from '../shared/types/Transaction'
+import type { Category, Subcategory } from '../shared/types/Category.ts'
+import type { Account } from '../shared/types/Account.ts'
 
 import { createTransaction, fetchTransactions, removeTransaction } from './services/transactions.ts'
 import { fetchCategories, fetchSubcategories } from './services/categories.ts'

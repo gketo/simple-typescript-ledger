@@ -1,4 +1,4 @@
-import { type Category, type CategoryId, type Subcategory, type SubcategoryId } from './Category.ts'
+import { type Category, type CategoryId, type Subcategory, type SubcategoryId } from './Category.js'
 import type { Account, AccountId } from './Account.ts'
 
 export interface Transaction {

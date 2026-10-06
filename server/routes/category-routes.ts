@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 
-import { dbGetCategories, dbGetSubcategories } from '../services/category-database.ts'
+import { dbGetCategories, dbGetSubcategories } from '../services/category-database.js'
 
 export async function categoryRoutes(fastify: FastifyInstance) {
   fastify.get('/categories', async (request, reply) => {

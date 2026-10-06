@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 
-import { dbGetAccounts } from '../services/account-database.ts'
+import { dbGetAccounts } from '../services/account-database.js'
 
 export async function accountRoutes(fastify: FastifyInstance) {
   fastify.get('/accounts', async (request, reply) => {

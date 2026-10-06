@@ -1,9 +1,9 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
-import { transactionRoutes } from './routes/transaction-routes.ts'
-import { categoryRoutes } from './routes/category-routes.ts'
-import { accountRoutes } from './routes/account-routes.ts'
+import { transactionRoutes } from './routes/transaction-routes.js'
+import { categoryRoutes } from './routes/category-routes.js'
+import { accountRoutes } from './routes/account-routes.js'
 
 // listening port
 const PORT = 3000

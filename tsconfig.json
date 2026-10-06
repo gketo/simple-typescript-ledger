@@ -1,12 +1,11 @@
 {
   "files": [],
-  "extends": ["@tsconfig/node24/tsconfig.json", "@tsconfig/vite-react/tsconfig.json"]
-  // "references": [
-  //   {
-  //     "path": "./tsconfig.app.json"
-  //   },
-  //   {
-  //     "path": "./tsconfig.server.json"
-  //   }
-  // ]
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.server.json"
+    }
+  ]
 }

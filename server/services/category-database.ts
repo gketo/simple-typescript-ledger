@@ -1,6 +1,6 @@
-import { database } from './database.ts'
+import { database } from './database.js'
 
-import type { Category, Subcategory } from '../../shared/types/Category.ts'
+import type { Category, Subcategory } from '../../shared/types/Category.js'
 
 const queryCategories = database.prepare(
   `
