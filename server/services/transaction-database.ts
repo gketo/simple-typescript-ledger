@@ -1,6 +1,10 @@
-import { database } from './database'
+import { database } from './database.ts'
 
-import type { Transaction, NewTransactionInput, TransactionId } from '../../src/types/Transaction'
+import type {
+  Transaction,
+  NewTransactionInput,
+  TransactionId,
+} from '../../shared/types/Transaction.ts'
 
 type SQLTransaction = {
   id: number

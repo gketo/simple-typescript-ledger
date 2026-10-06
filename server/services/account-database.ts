@@ -1,6 +1,6 @@
-import { database } from './database'
+import { database } from './database.ts'
 
-import { Account } from '../../src/types/Account'
+import type { Account } from '../../shared/types/Account.ts'
 
 const queryAccounts = database.prepare(
   `

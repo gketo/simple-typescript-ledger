@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Transaction, TransactionId } from '@/types/Transaction'
+import type { Transaction, TransactionId } from '../../shared/types//Transaction'
 
 const props = defineProps<{ transactions: Transaction[] }>()
 

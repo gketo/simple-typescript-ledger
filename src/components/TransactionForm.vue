@@ -5,10 +5,10 @@ import {
   createEmptyTransactionInput,
   isValidTransaction,
   type NewTransactionInput,
-} from '@/types/Transaction'
+} from '../../shared/types//Transaction'
 
-import type { Category, Subcategory } from '@/types/Category'
-import type { Account } from '@/types/Account'
+import type { Category, Subcategory } from '../../shared/types//Category'
+import type { Account } from '../../shared/types//Account'
 
 const form = ref(createEmptyTransactionInput())
 

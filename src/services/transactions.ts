@@ -1,4 +1,8 @@
-import type { NewTransactionInput, TransactionId, Transaction } from '@/types/Transaction'
+import type {
+  NewTransactionInput,
+  TransactionId,
+  Transaction,
+} from '../../shared/types//Transaction'
 
 export async function createTransaction(transaction: NewTransactionInput): Promise<Transaction> {
   const response = await fetch('http://localhost:3000/transactions', {

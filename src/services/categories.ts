@@ -1,4 +1,4 @@
-import type { Category, Subcategory } from '@/types/Category'
+import type { Category, Subcategory } from '../../shared/types//Category'
 
 export async function fetchCategories(): Promise<Category[]> {
   const response = await fetch('http://localhost:3000/categories')

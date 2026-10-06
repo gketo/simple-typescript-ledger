@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 
-import { isValidTransaction, type NewTransactionInput } from '../../src/types/Transaction'
+import { isValidTransaction, type NewTransactionInput } from '../../shared/types/Transaction.ts'
 
 import {
   dbGetTransactions,
   dbCreateTransaction,
   dbDeleteTransaction,
-} from '../services/transaction-database'
+} from '../services/transaction-database.ts'
 
 export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.get('/transactions', async (request, reply) => {
