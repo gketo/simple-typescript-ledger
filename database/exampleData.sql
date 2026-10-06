@@ -10,7 +10,7 @@ INSERT INTO transactions (
     subcategory_id,
     description,
     payee,
-    amount,
+    amount_cents,
     account_id,
     has_invoice
 )
@@ -21,7 +21,7 @@ VALUES
     (SELECT id FROM subcategories WHERE name = 'Hébergement web'),
     'Abonnement hébergement annuel',
     'OVH',
-    89.00,
+    8900,
     (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
@@ -31,7 +31,7 @@ VALUES
     (SELECT id FROM subcategories WHERE name = 'Carburant'),
     'Plein de carburant',
     'TotalEnergies',
-    72.50,
+    7250,
     (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
@@ -41,7 +41,7 @@ VALUES
     (SELECT id FROM subcategories WHERE name = 'Matériel professionnel'),
     'Écran professionnel',
     'Dell',
-    349.99,
+    34999,
     (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
@@ -51,7 +51,7 @@ VALUES
     (SELECT id FROM subcategories WHERE name = 'URSSAF'),
     'Cotisations sociales',
     'URSSAF',
-    1250.00,
+    125000,
     (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
@@ -61,7 +61,7 @@ VALUES
     (SELECT id FROM subcategories WHERE name = 'Téléphonie & Internet'),
     'Abonnement Internet',
     'Orange',
-    39.99,
+    3999,
     (SELECT id FROM accounts WHERE name = 'Compte Courant'),
     1
 ),
@@ -72,7 +72,7 @@ VALUES
     NULL,
     'Péage déplacement client',
     'Vinci Autoroutes',
-    14.80,
+    1480,
     (SELECT id FROM accounts WHERE name = 'Compte Pro'),
     0
 ),
@@ -83,7 +83,7 @@ VALUES
     NULL,
     'Rémunération septembre',
     NULL,
-    1800.00,
+    180000,
     (SELECT id FROM accounts WHERE name = 'Compte Pro'),
     0
 );

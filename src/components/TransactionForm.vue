@@ -29,7 +29,7 @@ function createFormTransaction(transaction?: Transaction): TransactionFormData {
       subcategory: transaction.subcategory,
       description: transaction.description,
       payee: transaction.payee,
-      amount: transaction.amount,
+      amountInCents: transaction.amountInCents,
       account: transaction.account,
       hasInvoice: transaction.hasInvoice,
     }
@@ -39,7 +39,7 @@ function createFormTransaction(transaction?: Transaction): TransactionFormData {
       category: undefined,
       subcategory: undefined,
       description: '',
-      amount: 0,
+      amountInCents: 0,
       account: undefined,
       hasInvoice: false,
     }
@@ -50,15 +50,17 @@ const formData = props.editMode.active
   ? ref(createFormTransaction(props.editMode.transaction))
   : ref(createFormTransaction())
 
+const amount = ref<number>(0)
+
 function submitForm(transaction: TransactionFormData) {
   if (
     transaction.date.length > 0 &&
     transaction.category !== undefined &&
     transaction.description.length > 0 &&
-    transaction.amount !== 0 &&
-    transaction.account !== undefined
+    transaction.account !== undefined &&
+    amount.value !== 0
   ) {
-    emit('submit', transaction)
+    emit('submit', { ...transaction, amountInCents: Math.round(amount.value * 100) })
     formData.value = createFormTransaction()
   } else {
     console.warn('Invalid submit event transaction!')
@@ -108,7 +110,14 @@ const subcategoriesFiltered = computed(() => {
     />
 
     <label for="amount">Montant</label>
-    <input type="number" id="amount" name="amount" v-model.number="formData.amount" />
+    <input
+      type="number"
+      step="0.01"
+      placeholder="0.00"
+      id="amount"
+      name="amount"
+      v-model.number="amount"
+    />
 
     <label for="account">Compte</label>
     <select id="account" name="account" v-model="formData.account">

@@ -7,7 +7,7 @@ export interface TransactionFormData {
   subcategory: Subcategory | undefined
   description: string
   payee?: string
-  amount: number
+  amountInCents: number
   account: Account | undefined
   hasInvoice: boolean
 }

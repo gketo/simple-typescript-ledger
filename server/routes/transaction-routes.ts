@@ -33,7 +33,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       schema: {
         body: {
           type: 'object',
-          required: ['date', 'category', 'description', 'amount', 'account', 'hasInvoice'],
+          required: ['date', 'category', 'description', 'amountInCents', 'account', 'hasInvoice'],
           properties: {
             date: { type: 'string' },
             category: {
@@ -45,7 +45,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
               },
             },
             description: { type: 'string' },
-            amount: { type: 'number' },
+            amountInCents: { type: 'number' },
             account: {
               type: 'object',
               required: ['id', 'name'],
@@ -66,7 +66,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         transaction.date.length > 0 &&
         transaction.category !== undefined &&
         transaction.description.length > 0 &&
-        transaction.amount !== 0 &&
+        transaction.amountInCents !== 0 &&
         transaction.account !== undefined
       ) {
         try {
@@ -149,7 +149,15 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       schema: {
         body: {
           type: 'object',
-          required: ['id', 'date', 'category', 'description', 'amount', 'account', 'hasInvoice'],
+          required: [
+            'id',
+            'date',
+            'category',
+            'description',
+            'amountInCents',
+            'account',
+            'hasInvoice',
+          ],
           properties: {
             date: { type: 'string' },
             category: {
@@ -161,7 +169,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
               },
             },
             description: { type: 'string' },
-            amount: { type: 'number' },
+            amountInCents: { type: 'number' },
             account: {
               type: 'object',
               required: ['id', 'name'],
@@ -191,7 +199,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         transaction.date.length > 0 &&
         transaction.category !== undefined &&
         transaction.description.length > 0 &&
-        transaction.amount !== 0 &&
+        transaction.amountInCents !== 0 &&
         transaction.account !== undefined
       ) {
         try {

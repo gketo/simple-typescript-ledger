@@ -93,8 +93,7 @@ onMounted(() => {
 
 const balance = computed(() => {
   return transactions.value.reduce((acc, trans) => {
-    const sum = acc + trans.amount
-    return Number(sum.toFixed(2))
+    return acc + trans.amountInCents
   }, 0)
 })
 
@@ -156,7 +155,7 @@ async function updateTransaction(id: TransactionId, transaction: TransactionForm
 
 <template>
   <h1>Mon Ledger</h1>
-  <div>Solde : {{ balance }} €</div>
+  <div>Solde : {{ (balance / 100).toFixed(2) }} €</div>
   <h2>Transactions</h2>
   <div v-show="isLoading">Chargement en cours...</div>
   <TransactionList

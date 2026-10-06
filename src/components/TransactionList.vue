@@ -56,17 +56,19 @@ function onUpdatingError(id: TransactionId, eventData: string) {
     </thead>
     <tbody>
       <tr v-for="transaction in props.transactions" :key="transaction.id">
-        <div v-if="isBeingModified.has(transaction.id)">
-          <TransactionForm
-            :editMode="{ active: true, transaction: transaction }"
-            :categories="categories"
-            :subcategories="subcategories"
-            :accounts="accounts"
-            @submit="updateTransaction(transaction.id, $event)"
-            @error="onUpdatingError(transaction.id, $event)"
-          />
-        </div>
-        <div v-else>
+        <template v-if="isBeingModified.has(transaction.id)">
+          <td colspan="10">
+            <TransactionForm
+              :editMode="{ active: true, transaction: transaction }"
+              :categories="categories"
+              :subcategories="subcategories"
+              :accounts="accounts"
+              @submit="updateTransaction(transaction.id, $event)"
+              @error="onUpdatingError(transaction.id, $event)"
+            />
+          </td>
+        </template>
+        <template v-else>
           <td><button @click="deleteTransaction(transaction.id)">[delete]</button></td>
           <td><button @click="isBeingModified.add(transaction.id)">[edit]</button></td>
           <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
@@ -74,10 +76,10 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           <td>{{ transaction.subcategory?.name }}</td>
           <td>{{ transaction.description }}</td>
           <td>{{ transaction.payee }}</td>
-          <td>{{ transaction.amount }}</td>
+          <td>{{ (transaction.amountInCents / 100).toFixed(2) }}</td>
           <td>{{ transaction.account.name }}</td>
           <td>{{ transaction.hasInvoice }}</td>
-        </div>
+        </template>
       </tr>
     </tbody>
   </table>

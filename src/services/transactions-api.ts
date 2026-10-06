@@ -55,7 +55,7 @@ export async function fetchTransactions(): Promise<Transaction[]> {
       date: new Date(transactionJSON.date),
       category: transactionJSON.category,
       description: transactionJSON.description,
-      amount: transactionJSON.amount,
+      amountInCents: transactionJSON.amountInCents,
       account: transactionJSON.account,
       hasInvoice: transactionJSON.hasInvoice === 1,
     }

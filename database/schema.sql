@@ -27,7 +27,7 @@ CREATE TABLE transactions(
     subcategory_id INTEGER,
     description TEXT NOT NULL,
     payee TEXT,
-    amount REAL NOT NULL,
+    amount_cents REAL NOT NULL,
     account_id INTEGER NOT NULL,
     has_invoice BOOLEAN CHECK (has_invoice IN (0, 1)) DEFAULT FALSE,
     FOREIGN KEY (category_id)

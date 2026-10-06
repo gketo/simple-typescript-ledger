@@ -8,7 +8,7 @@ export interface Transaction {
   subcategory?: Subcategory
   description: string
   payee?: string
-  amount: number
+  amountInCents: number
   account: Account
   hasInvoice: boolean
 }
@@ -22,7 +22,7 @@ export type TransactionJSON = {
   subcategory?: Subcategory
   description: string
   payee?: string
-  amount: number
+  amountInCents: number
   account: Account
   hasInvoice: number
 }

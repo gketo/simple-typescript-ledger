@@ -9,7 +9,7 @@ type TransactionSQL = {
   subcategory: string | null
   description: string
   payee: string | null
-  amount: number
+  amountInCents: number
   account: string
   hasInvoice: number
 }
@@ -21,7 +21,7 @@ const queryTransactions = database.prepare(
       trans.date,
       trans.description,
       trans.payee,
-      trans.amount,
+      trans.amount_cents AS amountInCents,
       trans.has_invoice AS hasInvoice,
       json_object(
         'id', cat.id, 
@@ -60,7 +60,7 @@ export function dbGetTransactions(): Transaction[] {
       date: new Date(transactionSql.date),
       category: JSON.parse(transactionSql.category),
       description: transactionSql.description,
-      amount: transactionSql.amount,
+      amountInCents: transactionSql.amountInCents,
       account: JSON.parse(transactionSql.account),
       hasInvoice: transactionSql.hasInvoice === 1,
     }
@@ -87,7 +87,7 @@ const insertTransaction = database.prepare(
         subcategory_id,
         description,
         payee,
-        amount,
+        amount_cents,
         account_id,
         has_invoice
       )
@@ -106,7 +106,7 @@ export function dbCreateTransaction(transaction: TransactionJSON): TransactionId
       transaction.subcategory ? transaction.subcategory.id : null,
       transaction.description,
       transaction.payee ?? null,
-      transaction.amount,
+      transaction.amountInCents,
       transaction.account ? transaction.account.id : null,
       transaction.hasInvoice ? 1 : 0,
     )
@@ -145,7 +145,7 @@ const updateTransaction = database.prepare(
       subcategory_id = (?),
       description = (?),
       payee = (?),
-      amount = (?),
+      amount_cents = (?),
       account_id = (?),
       has_invoice = (?)
     WHERE
@@ -160,7 +160,7 @@ export function dbUpdateTransaction(transaction: TransactionJSON) {
     transaction.subcategory ? transaction.subcategory.id : null,
     transaction.description,
     transaction.payee ?? null,
-    transaction.amount,
+    transaction.amountInCents,
     transaction.account ? transaction.account.id : null,
     transaction.hasInvoice ? 1 : 0,
     transaction.id,
