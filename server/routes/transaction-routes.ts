@@ -95,9 +95,9 @@ export async function transactionRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const id = parseInt(request.params.id)
-
       try {
+        const id = parseInt(request.params.id)
+
         dbDeleteTransaction(id)
 
         reply.code(200).send({ id })

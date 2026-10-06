@@ -14,6 +14,7 @@ function deleteTransaction(id: TransactionId) {
   <table>
     <thead>
       <tr>
+        <th></th>
         <th>Date</th>
         <th>Catégorie</th>
         <th>Sous-catégorie</th>
@@ -28,13 +29,12 @@ function deleteTransaction(id: TransactionId) {
       <tr v-for="transaction in props.transactions" :key="transaction.id">
         <td><button @click="deleteTransaction(transaction.id)">[delete]</button></td>
         <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.category }}</td>
-        <td>{{ transaction.subcategory }}</td>
+        <td>{{ transaction.category.name }}</td>
+        <td>{{ transaction.subcategory?.name }}</td>
         <td>{{ transaction.description }}</td>
         <td>{{ transaction.payee }}</td>
         <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.account }}</td>
+        <td>{{ transaction.account.name }}</td>
         <td>{{ transaction.hasInvoice }}</td>
       </tr>
     </tbody>
