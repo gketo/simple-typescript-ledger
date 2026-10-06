@@ -23,9 +23,9 @@ const emit = defineEmits<{
   validationError: [message: string]
 }>()
 
-function submitForm(formData: NewTransactionInput) {
-  if (isValidTransaction(formData)) {
-    emit('submit', formData)
+function submitForm(newTransaction: NewTransactionInput) {
+  if (isValidTransaction(newTransaction)) {
+    emit('submit', newTransaction)
 
     form.value = createEmptyTransactionInput()
   } else {
@@ -36,7 +36,7 @@ function submitForm(formData: NewTransactionInput) {
 
 // filter subcategories
 const subcategoriesFiltered = computed(() => {
-  const selectedCategoryId = form.value.categoryId
+  const selectedCategoryId = form.value.category?.id
 
   return props.subcategories.filter((subcategory) => subcategory.categoryId === selectedCategoryId)
 })
@@ -48,16 +48,20 @@ const subcategoriesFiltered = computed(() => {
     <input type="date" id="date" name="date" v-model="form.date" />
 
     <label for="categoryId">Catégorie</label>
-    <select id="categoryId" name="categoryId" v-model="form.categoryId">
-      <option v-for="category in props.categories" :value="category.id">
+    <select id="categoryId" name="categoryId" v-model="form.category">
+      <option v-for="category in props.categories" :value="category" :key="category.id">
         {{ category.name }}
       </option>
     </select>
 
     <label for="subcategoryId">Sous-catégorie</label>
-    <select id="subcategoryId" name="subcategoryId" v-model="form.subcategoryId">
-      <option :value="undefined">Aucune</option>
-      <option v-for="subcategory in subcategoriesFiltered" :value="subcategory.id">
+    <select id="subcategoryId" name="subcategoryId" v-model="form.subcategory">
+      <option :key="undefined">Aucune</option>
+      <option
+        v-for="subcategory in subcategoriesFiltered"
+        :value="subcategory"
+        :key="subcategory.id"
+      >
         {{ subcategory.name }}
       </option>
     </select>
@@ -75,8 +79,8 @@ const subcategoriesFiltered = computed(() => {
     <input type="number" id="amount" name="amount" v-model.number="form.amount" />
 
     <label for="account">Compte</label>
-    <select id="account" name="account" v-model="form.accountId">
-      <option v-for="account in accounts" :value="account.id">
+    <select id="account" name="account" v-model="form.account">
+      <option v-for="account in accounts" :value="account" :key="account.id">
         {{ account.name }}
       </option>
     </select>

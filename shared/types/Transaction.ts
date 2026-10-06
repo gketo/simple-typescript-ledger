@@ -20,19 +20,19 @@ export type NewTransactionInput = Omit<
   'id' | 'date' | 'category' | 'subcategory' | 'account'
 > & {
   date: string
-  categoryId: CategoryId | undefined
-  subcategoryId: SubcategoryId | undefined
-  accountId: AccountId | undefined
+  category: Category | undefined
+  subcategory: Subcategory | undefined
+  account: Account | undefined
 }
 
 export function createEmptyTransactionInput(): NewTransactionInput {
   return {
     date: '',
-    categoryId: undefined,
-    subcategoryId: undefined,
+    category: undefined,
+    subcategory: undefined,
     description: '',
     amount: 0,
-    accountId: undefined,
+    account: undefined,
     hasInvoice: false,
   }
 }
@@ -40,9 +40,9 @@ export function createEmptyTransactionInput(): NewTransactionInput {
 export function isValidTransaction(transaction: NewTransactionInput): boolean {
   return (
     transaction.date.length > 0 &&
-    transaction.categoryId !== undefined &&
+    transaction.category !== undefined &&
     transaction.description.length > 0 &&
     transaction.amount !== 0 &&
-    transaction.accountId !== undefined
+    transaction.account !== undefined
   )
 }
