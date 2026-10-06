@@ -38,7 +38,10 @@ const balance = computed(() => {
 async function addTransaction(tFormData: NewTransactionInput) {
   try {
     const added: Transaction = await createTransaction(tFormData)
+
     transactions.value.push(added)
+
+    transactions.value.sort((a, b) => a.date.getTime() - b.date.getTime())
   } catch (err) {
     console.error('Error adding transaction:', err)
     if (err === 400) {
