@@ -28,9 +28,10 @@ onMounted(() => {
   loadAccounts()
 })
 
-const solde = computed(() => {
+const balance = computed(() => {
   return transactions.value.reduce((acc, trans) => {
-    return acc + trans.amount
+    const sum = acc + trans.amount
+    return Number(sum.toFixed(2))
   }, 0)
 })
 
@@ -120,7 +121,7 @@ async function loadAccounts() {
 
 <template>
   <h1>Mon Ledger</h1>
-  <div>Solde : {{ solde }} €</div>
+  <div>Solde : {{ balance }} €</div>
   <h2>Transactions</h2>
   <div v-show="isLoading">Chargement en cours...</div>
   <TransactionList v-show="!isLoading" :transactions="transactions" @delete="deleteTransaction" />
