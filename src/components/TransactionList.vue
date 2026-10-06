@@ -1,12 +1,40 @@
 <script setup lang="ts">
-import type { Transaction, TransactionId } from '../../shared/types//Transaction'
+import { ref } from 'vue'
 
-const props = defineProps<{ transactions: Transaction[] }>()
+import TransactionForm from './TransactionForm.vue'
 
-const emit = defineEmits<{ delete: [id: TransactionId] }>()
+import type { Transaction, TransactionId } from '@shared/types//Transaction'
+import type { Category, Subcategory } from '@shared/types/Category.ts'
+import type { Account } from '@shared/types/Account.ts'
+
+import type { TransactionFormData } from '../types/TransactionFormData.ts'
+
+const props = defineProps<{
+  transactions: Transaction[]
+  categories: Category[]
+  subcategories: Subcategory[]
+  accounts: Account[]
+}>()
+
+const emit = defineEmits<{
+  delete: [id: TransactionId]
+  update: [id: TransactionId, newValue: TransactionFormData]
+  error: [message: string]
+}>()
 
 function deleteTransaction(id: TransactionId) {
   emit('delete', id)
+}
+
+const isBeingModified = ref<Set<number>>(new Set())
+
+function updateTransaction(id: TransactionId, eventData: TransactionFormData) {
+  emit('update', id, eventData)
+  isBeingModified.value.delete(id)
+}
+
+function onUpdatingError(id: TransactionId, eventData: string) {
+  emit('error', `Error updating transaction with id ${id}: ${eventData}`)
 }
 </script>
 
@@ -14,6 +42,7 @@ function deleteTransaction(id: TransactionId) {
   <table>
     <thead>
       <tr>
+        <th></th>
         <th></th>
         <th>Date</th>
         <th>Catégorie</th>
@@ -27,18 +56,29 @@ function deleteTransaction(id: TransactionId) {
     </thead>
     <tbody>
       <tr v-for="transaction in props.transactions" :key="transaction.id">
-        <td><button @click="deleteTransaction(transaction.id)">[delete]</button></td>
-        <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
-        <td>{{ transaction.category.name }}</td>
-        <td>{{ transaction.subcategory?.name }}</td>
-        <td>{{ transaction.description }}</td>
-        <td>{{ transaction.payee }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.account.name }}</td>
-        <td>{{ transaction.hasInvoice }}</td>
+        <div v-if="isBeingModified.has(transaction.id)">
+          <TransactionForm
+            :editMode="{ active: true, transaction: transaction }"
+            :categories="categories"
+            :subcategories="subcategories"
+            :accounts="accounts"
+            @submit="updateTransaction(transaction.id, $event)"
+            @error="onUpdatingError(transaction.id, $event)"
+          />
+        </div>
+        <div v-else>
+          <td><button @click="deleteTransaction(transaction.id)">[delete]</button></td>
+          <td><button @click="isBeingModified.add(transaction.id)">[edit]</button></td>
+          <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
+          <td>{{ transaction.category.name }}</td>
+          <td>{{ transaction.subcategory?.name }}</td>
+          <td>{{ transaction.description }}</td>
+          <td>{{ transaction.payee }}</td>
+          <td>{{ transaction.amount }}</td>
+          <td>{{ transaction.account.name }}</td>
+          <td>{{ transaction.hasInvoice }}</td>
+        </div>
       </tr>
     </tbody>
   </table>
 </template>
-
-<style scoped></style>

@@ -1,12 +1,8 @@
 import { database } from './database.js'
 
-import type {
-  Transaction,
-  NewTransactionInput,
-  TransactionId,
-} from '../../shared/types/Transaction.js'
+import type { Transaction, TransactionId, TransactionJSON } from '@shared/types/Transaction.js'
 
-type SQLTransaction = {
+type TransactionSQL = {
   id: number
   date: string
   category: string
@@ -56,7 +52,7 @@ const queryTransactions = database.prepare(
 )
 
 export function dbGetTransactions(): Transaction[] {
-  const data = queryTransactions.all() as unknown as SQLTransaction[]
+  const data = queryTransactions.all() as unknown as TransactionSQL[]
 
   const transactions: Transaction[] = data.map((transactionSql) => {
     const temp: Transaction = {
@@ -100,19 +96,19 @@ const insertTransaction = database.prepare(
   `,
 )
 
-export function dbCreateTransaction(input: NewTransactionInput): TransactionId {
-  if (input.category === undefined) {
+export function dbCreateTransaction(transaction: TransactionJSON): TransactionId {
+  if (transaction.category === undefined) {
     throw new Error('Category is required')
   } else {
     const { changes, lastInsertRowid } = insertTransaction.run(
-      input.date,
-      input.category.id,
-      input.subcategory ? input.subcategory.id : null,
-      input.description,
-      input.payee ?? null,
-      input.amount,
-      input.account ? input.account.id : null,
-      input.hasInvoice ? 1 : 0,
+      transaction.date,
+      transaction.category.id,
+      transaction.subcategory ? transaction.subcategory.id : null,
+      transaction.description,
+      transaction.payee ?? null,
+      transaction.amount,
+      transaction.account ? transaction.account.id : null,
+      transaction.hasInvoice ? 1 : 0,
     )
 
     if (changes !== 1) {
@@ -138,4 +134,41 @@ export function dbDeleteTransaction(id: TransactionId) {
   if (changes !== 1) {
     throw id
   }
+}
+
+const updateTransaction = database.prepare(
+  `
+    UPDATE transactions
+    SET
+      date = (?),
+      category_id = (?),
+      subcategory_id = (?),
+      description = (?),
+      payee = (?),
+      amount = (?),
+      account_id = (?),
+      has_invoice = (?)
+    WHERE
+      id = (?) 
+  `,
+)
+
+export function dbUpdateTransaction(transaction: TransactionJSON) {
+  const { changes } = updateTransaction.run(
+    transaction.date,
+    transaction.category.id,
+    transaction.subcategory ? transaction.subcategory.id : null,
+    transaction.description,
+    transaction.payee ?? null,
+    transaction.amount,
+    transaction.account ? transaction.account.id : null,
+    transaction.hasInvoice ? 1 : 0,
+    transaction.id,
+  )
+
+  if (changes !== 1) {
+    throw new Error(`Database: Error updating transaction with id: ${transaction.id}`)
+  }
+
+  return transaction
 }

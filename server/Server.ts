@@ -14,7 +14,7 @@ const fastify = Fastify()
 // CORS
 await fastify.register(cors, {
   origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'DELETE'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT'],
 })
 
 // transaction routes

@@ -1,11 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 
-import { isValidTransaction, type NewTransactionInput } from '../../shared/types/Transaction.js'
+import type { TransactionId, TransactionJSON } from '@shared/types/Transaction.js'
 
 import {
   dbGetTransactions,
   dbCreateTransaction,
   dbDeleteTransaction,
+  dbUpdateTransaction,
 } from '../services/transaction-database.js'
 
 export async function transactionRoutes(fastify: FastifyInstance) {
@@ -26,7 +27,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
   })
 
   // todo impodency key with periodic cleaninc in separate table
-  fastify.post<{ Body: NewTransactionInput }>(
+  fastify.post<{ Body: TransactionJSON }>(
     '/transactions',
     {
       schema: {
@@ -35,23 +36,43 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           required: ['date', 'category', 'description', 'amount', 'account', 'hasInvoice'],
           properties: {
             date: { type: 'string' },
-            categoryId: { type: 'integer' },
+            category: {
+              type: 'object',
+              required: ['id', 'name'],
+              properties: {
+                id: { type: 'integer' },
+                name: { type: 'string' },
+              },
+            },
             description: { type: 'string' },
             amount: { type: 'number' },
-            accountId: { type: 'integer' },
+            account: {
+              type: 'object',
+              required: ['id', 'name'],
+              properties: {
+                id: { type: 'integer' },
+                name: { type: 'string' },
+              },
+            },
             hasInvoice: { type: 'boolean' },
           },
         },
       },
     },
     async (request, reply) => {
-      const input: NewTransactionInput = request.body
+      const transaction: TransactionJSON = request.body
 
-      if (isValidTransaction(input)) {
+      if (
+        transaction.date.length > 0 &&
+        transaction.category !== undefined &&
+        transaction.description.length > 0 &&
+        transaction.amount !== 0 &&
+        transaction.account !== undefined
+      ) {
         try {
-          const id = dbCreateTransaction(input)
+          const id = dbCreateTransaction(transaction)
 
-          reply.code(201).send({ ...input, id: id })
+          reply.code(201).send({ ...transaction, id: id })
         } catch (err) {
           reply.code(500).send({
             error: {
@@ -96,11 +117,9 @@ export async function transactionRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const id = parseInt(request.params.id)
-
+        const id: TransactionId = parseInt(request.params.id)
         dbDeleteTransaction(id)
-
-        reply.code(200).send({ id })
+        reply.code(200)
       } catch (err) {
         if (err instanceof Error) {
           reply.code(404).send({
@@ -119,6 +138,87 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             },
           })
         }
+      }
+    },
+  )
+
+  // todo impodency key with periodic cleaninc in separate table
+  fastify.put<{ Params: TransactionParams; Body: TransactionJSON }>(
+    '/transactions/:id',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          required: ['id', 'date', 'category', 'description', 'amount', 'account', 'hasInvoice'],
+          properties: {
+            date: { type: 'string' },
+            category: {
+              type: 'object',
+              required: ['id', 'name'],
+              properties: {
+                id: { type: 'integer' },
+                name: { type: 'string' },
+              },
+            },
+            description: { type: 'string' },
+            amount: { type: 'number' },
+            account: {
+              type: 'object',
+              required: ['id', 'name'],
+              properties: {
+                id: { type: 'integer' },
+                name: { type: 'string' },
+              },
+            },
+            hasInvoice: { type: 'boolean' },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const transaction: TransactionJSON = request.body
+
+      const id: TransactionId = parseInt(request.params.id)
+
+      if (id !== transaction.id) {
+        reply.code(400).send({
+          error: {
+            code: 'CORRUPTED',
+            message: `Expected transaction ${id}, got ${transaction.id}`,
+          },
+        })
+      } else if (
+        transaction.date.length > 0 &&
+        transaction.category !== undefined &&
+        transaction.description.length > 0 &&
+        transaction.amount !== 0 &&
+        transaction.account !== undefined
+      ) {
+        try {
+          const modified = dbUpdateTransaction(transaction)
+          reply.code(200).send(modified)
+        } catch (err) {
+          reply.code(500).send({
+            error: {
+              code: 'SERVER_ERROR',
+              message: 'An error occurred while updating the transaction.',
+            },
+          })
+        }
+      } else {
+        console.log(transaction)
+        reply.code(400).send({
+          error: {
+            code: 'EMPTY_FIELD',
+            message: 'Required transaction fields are missing',
+            details: [
+              {
+                field: 'asterix',
+                message: 'Asterix (*) fields are required',
+              },
+            ],
+          },
+        })
       }
     },
   )

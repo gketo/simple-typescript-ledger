@@ -1,61 +1,93 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import {
-  createEmptyTransactionInput,
-  isValidTransaction,
-  type NewTransactionInput,
-} from '../../shared/types//Transaction'
+import { type Transaction } from '@shared/types/Transaction'
+import type { Category, Subcategory } from '@shared/types//Category'
+import type { Account } from '@shared/types//Account'
 
-import type { Category, Subcategory } from '../../shared/types//Category'
-import type { Account } from '../../shared/types//Account'
+import { type TransactionFormData, formatDateInput } from '../types/TransactionFormData.ts'
 
-const form = ref(createEmptyTransactionInput())
+type EditMode = { active: true; transaction: Transaction } | { active: false; transaction?: never }
 
 const props = defineProps<{
+  editMode: EditMode
   categories: Category[]
   subcategories: Subcategory[]
   accounts: Account[]
 }>()
 
 const emit = defineEmits<{
-  submit: [data: NewTransactionInput]
-  validationError: [message: string]
+  submit: [data: TransactionFormData]
+  error: [message: string]
 }>()
 
-function submitForm(newTransaction: NewTransactionInput) {
-  if (isValidTransaction(newTransaction)) {
-    emit('submit', newTransaction)
+function createFormTransaction(transaction?: Transaction): TransactionFormData {
+  if (transaction) {
+    return {
+      date: formatDateInput(transaction.date),
+      category: transaction.category,
+      subcategory: transaction.subcategory,
+      description: transaction.description,
+      payee: transaction.payee,
+      amount: transaction.amount,
+      account: transaction.account,
+      hasInvoice: transaction.hasInvoice,
+    }
+  } else {
+    return {
+      date: '',
+      category: undefined,
+      subcategory: undefined,
+      description: '',
+      amount: 0,
+      account: undefined,
+      hasInvoice: false,
+    }
+  }
+}
 
-    form.value = createEmptyTransactionInput()
+const formData = props.editMode.active
+  ? ref(createFormTransaction(props.editMode.transaction))
+  : ref(createFormTransaction())
+
+function submitForm(transaction: TransactionFormData) {
+  if (
+    transaction.date.length > 0 &&
+    transaction.category !== undefined &&
+    transaction.description.length > 0 &&
+    transaction.amount !== 0 &&
+    transaction.account !== undefined
+  ) {
+    emit('submit', transaction)
+    formData.value = createFormTransaction()
   } else {
     console.warn('Invalid submit event transaction!')
-    emit('validationError', 'Required transaction fields are missing')
+    emit('error', 'Required transaction fields are missing')
   }
 }
 
 // filter subcategories
 const subcategoriesFiltered = computed(() => {
-  const selectedCategoryId = form.value.category?.id
+  const selectedCategoryId = formData.value.category?.id
 
   return props.subcategories.filter((subcategory) => subcategory.categoryId === selectedCategoryId)
 })
 </script>
 
 <template>
-  <form @submit.prevent="submitForm(form)">
+  <form @submit.prevent="submitForm(formData)">
     <label for="date">Date</label>
-    <input type="date" id="date" name="date" v-model="form.date" />
+    <input type="date" id="date" name="date" v-model="formData.date" />
 
     <label for="categoryId">Catégorie</label>
-    <select id="categoryId" name="categoryId" v-model="form.category">
+    <select id="categoryId" name="categoryId" v-model="formData.category">
       <option v-for="category in props.categories" :value="category" :key="category.id">
         {{ category.name }}
       </option>
     </select>
 
     <label for="subcategoryId">Sous-catégorie</label>
-    <select id="subcategoryId" name="subcategoryId" v-model="form.subcategory">
+    <select id="subcategoryId" name="subcategoryId" v-model="formData.subcategory">
       <option :key="undefined">Aucune</option>
       <option
         v-for="subcategory in subcategoriesFiltered"
@@ -71,15 +103,15 @@ const subcategoriesFiltered = computed(() => {
       type="text"
       id="description"
       name="description"
-      v-model="form.description"
+      v-model="formData.description"
       placeholder="Remplir ici"
     />
 
     <label for="amount">Montant</label>
-    <input type="number" id="amount" name="amount" v-model.number="form.amount" />
+    <input type="number" id="amount" name="amount" v-model.number="formData.amount" />
 
     <label for="account">Compte</label>
-    <select id="account" name="account" v-model="form.account">
+    <select id="account" name="account" v-model="formData.account">
       <option v-for="account in accounts" :value="account" :key="account.id">
         {{ account.name }}
       </option>
@@ -91,10 +123,11 @@ const subcategoriesFiltered = computed(() => {
       id="hasInvoice"
       name="hasInvoice"
       value="hasInvoice"
-      v-model="form.hasInvoice"
+      v-model="formData.hasInvoice"
     />
 
-    <input type="submit" value="Ajouter" />
+    <input v-if="editMode.active" type="submit" value="Valider" />
+    <input v-else type="submit" value="Ajouter" />
   </form>
 </template>
 
