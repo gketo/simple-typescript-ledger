@@ -17,10 +17,19 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  create: [data: TransactionFormData]
   delete: [id: TransactionId]
-  update: [id: TransactionId, newValue: TransactionFormData]
+  update: [id: TransactionId, data: TransactionFormData]
   error: [message: string]
 }>()
+
+function createTransaction(transaction: TransactionFormData) {
+  emit('create', transaction)
+}
+
+function onCreationError(eventData: string) {
+  emit('error', `Error creating transaction: ${eventData}`)
+}
 
 function deleteTransaction(id: TransactionId) {
   emit('delete', id)
@@ -42,7 +51,6 @@ function onUpdatingError(id: TransactionId, eventData: string) {
   <table>
     <thead>
       <tr>
-        <th v-show="isBeingModified.size === 0"></th>
         <th>Date</th>
         <th>Catégorie</th>
         <th>Sous-catégorie</th>
@@ -54,22 +62,18 @@ function onUpdatingError(id: TransactionId, eventData: string) {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="transaction in props.transactions" :key="transaction.id">
-        <template v-if="isBeingModified.has(transaction.id)">
-          <td colspan="100%">
-            <TransactionForm
-              :form-id="`transaction-form-${transaction.id}`"
-              :editMode="{ active: true, transaction: transaction }"
-              :categories="categories"
-              :subcategories="subcategories"
-              :accounts="accounts"
-              @submit="updateTransaction(transaction.id, $event)"
-              @error="onUpdatingError(transaction.id, $event)"
-            />
-          </td>
-        </template>
-        <template v-else>
-          <td><button @click="isBeingModified.add(transaction.id)">[edit]</button></td>
+      <template v-for="transaction in props.transactions" :key="transaction.id">
+        <TransactionForm
+          v-if="isBeingModified.has(transaction.id)"
+          :form-id="`transaction-form-${transaction.id}`"
+          :editMode="{ active: true, transaction: transaction }"
+          :categories="categories"
+          :subcategories="subcategories"
+          :accounts="accounts"
+          @submit="updateTransaction(transaction.id, $event)"
+          @error="onUpdatingError(transaction.id, $event)"
+        />
+        <tr v-else>
           <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
           <td>{{ transaction.category.name }}</td>
           <td>{{ transaction.subcategory?.name }}</td>
@@ -79,6 +83,9 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           <td>{{ transaction.account.name }}</td>
           <td>{{ transaction.hasInvoice }}</td>
           <td>
+            <button @click="isBeingModified.add(transaction.id)">[edit]</button>
+          </td>
+          <td>
             <button
               v-show="isBeingModified.has(transaction.id)"
               @click="deleteTransaction(transaction.id)"
@@ -86,8 +93,17 @@ function onUpdatingError(id: TransactionId, eventData: string) {
               [delete]
             </button>
           </td>
-        </template>
-      </tr>
+        </tr>
+      </template>
+      <TransactionForm
+        form-id="transaction-form-create"
+        :editMode="{ active: false }"
+        :categories="categories"
+        :subcategories="subcategories"
+        :accounts="accounts"
+        @submit="createTransaction"
+        @error="onCreationError"
+      />
     </tbody>
   </table>
 </template>

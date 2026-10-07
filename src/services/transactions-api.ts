@@ -2,7 +2,7 @@ import type { TransactionId, Transaction, TransactionJSON } from '@shared/types/
 
 import type { TransactionFormData } from '../types/TransactionFormData.ts'
 
-export async function createTransaction(transaction: TransactionFormData): Promise<Transaction> {
+export async function postTransaction(transaction: TransactionFormData): Promise<Transaction> {
   const response = await fetch('http://localhost:3000/transactions', {
     method: 'POST',
     headers: {
@@ -24,7 +24,7 @@ export async function createTransaction(transaction: TransactionFormData): Promi
   }
 }
 
-export async function removeTransaction(id: TransactionId): Promise<TransactionId> {
+export async function deleteTransaction(id: TransactionId): Promise<TransactionId> {
   const response = await fetch(`http://localhost:3000/transactions/${id}`, {
     method: 'DELETE',
   })

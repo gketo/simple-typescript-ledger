@@ -2,7 +2,6 @@
 import { computed, ref, onMounted } from 'vue'
 
 import TransactionList from './components/TransactionList.vue'
-import TransactionForm from './components/TransactionForm.vue'
 
 import type { Transaction, TransactionId } from '../shared/types/Transaction'
 import type { Category, Subcategory } from '../shared/types/Category.ts'
@@ -11,9 +10,9 @@ import type { Account } from '../shared/types/Account.ts'
 import type { TransactionFormData } from './types/TransactionFormData.ts'
 
 import {
-  createTransaction,
+  postTransaction,
   fetchTransactions,
-  removeTransaction,
+  deleteTransaction,
   putTransaction,
 } from './services/transactions-api.ts'
 import { fetchCategories, fetchSubcategories } from './services/categories-api.ts'
@@ -97,9 +96,9 @@ const balance = computed(() => {
   }, 0)
 })
 
-async function addTransaction(tFormData: TransactionFormData) {
+async function createTransaction(transaction: TransactionFormData) {
   try {
-    const added: Transaction = await createTransaction(tFormData)
+    const added: Transaction = await postTransaction(transaction)
 
     transactions.value.push(added)
 
@@ -114,9 +113,9 @@ async function addTransaction(tFormData: TransactionFormData) {
   }
 }
 
-async function deleteTransaction(id: TransactionId) {
+async function removeTransaction(id: TransactionId) {
   try {
-    const deleted = await removeTransaction(id)
+    const deleted = await deleteTransaction(id)
 
     for (let i = 0; i < transactions.value.length; i++) {
       const transaction = transactions.value[i]
@@ -164,18 +163,9 @@ async function updateTransaction(id: TransactionId, transaction: TransactionForm
     :categories="categories"
     :subcategories="subcategories"
     :accounts="accounts"
-    @delete="deleteTransaction"
+    @create="createTransaction"
+    @delete="removeTransaction"
     @update="updateTransaction"
-    @error="alertMsg = $event"
-  />
-  <TransactionForm
-    v-show="!isLoading"
-    form-id="transaction-form-create"
-    :editMode="{ active: false }"
-    :categories="categories"
-    :subcategories="subcategories"
-    :accounts="accounts"
-    @submit="addTransaction"
     @error="alertMsg = $event"
   />
   <div v-show="alertMsg.length"><button @click="alertMsg = ''">&times;</button>{{ alertMsg }}</div>
