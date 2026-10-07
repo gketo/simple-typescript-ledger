@@ -42,8 +42,7 @@ function onUpdatingError(id: TransactionId, eventData: string) {
   <table>
     <thead>
       <tr>
-        <th></th>
-        <th></th>
+        <th v-show="isBeingModified.size === 0"></th>
         <th>Date</th>
         <th>Catégorie</th>
         <th>Sous-catégorie</th>
@@ -57,9 +56,7 @@ function onUpdatingError(id: TransactionId, eventData: string) {
     <tbody>
       <tr v-for="transaction in props.transactions" :key="transaction.id">
         <template v-if="isBeingModified.has(transaction.id)">
-          <td></td>
-          <td></td>
-          <td colspan="10">
+          <td colspan="100%">
             <TransactionForm
               :editMode="{ active: true, transaction: transaction }"
               :categories="categories"
@@ -71,7 +68,6 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           </td>
         </template>
         <template v-else>
-          <td><button @click="deleteTransaction(transaction.id)">[delete]</button></td>
           <td><button @click="isBeingModified.add(transaction.id)">[edit]</button></td>
           <td>{{ transaction.date.getDate() }}/{{ transaction.date.getMonth() + 1 }}</td>
           <td>{{ transaction.category.name }}</td>
@@ -81,6 +77,14 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           <td>{{ (transaction.amountInCents / 100).toFixed(2) }}</td>
           <td>{{ transaction.account.name }}</td>
           <td>{{ transaction.hasInvoice }}</td>
+          <td>
+            <button
+              v-show="isBeingModified.has(transaction.id)"
+              @click="deleteTransaction(transaction.id)"
+            >
+              [delete]
+            </button>
+          </td>
         </template>
       </tr>
     </tbody>

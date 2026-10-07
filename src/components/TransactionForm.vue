@@ -79,77 +79,121 @@ const subcategoriesFiltered = computed(() => {
 </script>
 
 <template>
-  <form @submit.prevent="submitForm(formData)">
-    <input type="date" aria-label="date" id="date" name="date" v-model="formData.date" />
+  <tr>
+    <td>
+      <input
+        form="transaction-form"
+        type="date"
+        aria-label="date"
+        id="date"
+        name="date"
+        v-model="formData.date"
+      />
+    </td>
 
-    <select aria-label="Category" id="categoryId" name="categoryId" v-model="formData.category">
-      <option v-for="category in props.categories" :value="category" :key="category.id">
-        {{ category.name }}
-      </option>
-    </select>
-
-    <select
-      aria-label="Subcategory"
-      id="subcategoryId"
-      name="subcategoryId"
-      v-model="formData.subcategory"
-    >
-      <option :key="undefined">Aucune</option>
-      <option
-        v-for="subcategory in subcategoriesFiltered"
-        :value="subcategory"
-        :key="subcategory.id"
+    <td>
+      <select
+        form="transaction-form"
+        aria-label="Category"
+        id="categoryId"
+        name="categoryId"
+        v-model="formData.category"
       >
-        {{ subcategory.name }}
-      </option>
-    </select>
+        <option v-for="category in props.categories" :value="category" :key="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+    </td>
 
-    <input
-      type="text"
-      aria-label="Description"
-      id="description"
-      name="description"
-      v-model="formData.description"
-      placeholder="Ex.: Nom de domaine"
-    />
+    <td>
+      <select
+        form="transaction-form"
+        aria-label="Subcategory"
+        id="subcategoryId"
+        name="subcategoryId"
+        v-model="formData.subcategory"
+      >
+        <option :key="undefined">Aucune</option>
+        <option
+          v-for="subcategory in subcategoriesFiltered"
+          :value="subcategory"
+          :key="subcategory.id"
+        >
+          {{ subcategory.name }}
+        </option>
+      </select>
+    </td>
 
-    <input
-      type="text"
-      aria-label="Payee"
-      id="payee"
-      name="payee"
-      v-model="formData.payee"
-      placeholder="Ex.: OVH Cloud"
-    />
+    <td>
+      <input
+        form="transaction-form"
+        type="text"
+        aria-label="Description"
+        id="description"
+        name="description"
+        v-model="formData.description"
+        placeholder="Ex.: Nom de domaine"
+      />
+    </td>
 
-    <input
-      type="number"
-      step="0.01"
-      aria-label="Amount"
-      placeholder="0.00"
-      id="amount"
-      name="amount"
-      v-model.number="amount"
-    />
+    <td>
+      <input
+        form="transaction-form"
+        type="text"
+        aria-label="Payee"
+        id="payee"
+        name="payee"
+        v-model="formData.payee"
+        placeholder="Ex.: OVH Cloud"
+      />
+    </td>
 
-    <select aria-label="Account" id="account" name="account" v-model="formData.account">
-      <option v-for="account in accounts" :value="account" :key="account.id">
-        {{ account.name }}
-      </option>
-    </select>
+    <td>
+      <input
+        form="transaction-form"
+        type="number"
+        step="0.01"
+        aria-label="Amount"
+        placeholder="0.00"
+        id="amount"
+        name="amount"
+        v-model.number="amount"
+      />
+    </td>
 
-    <input
-      type="checkbox"
-      aria-label="Invoice"
-      id="hasInvoice"
-      name="hasInvoice"
-      value="hasInvoice"
-      v-model="formData.hasInvoice"
-    />
+    <td>
+      <select
+        form="transaction-form"
+        aria-label="Account"
+        id="account"
+        name="account"
+        v-model="formData.account"
+      >
+        <option v-for="account in accounts" :value="account" :key="account.id">
+          {{ account.name }}
+        </option>
+      </select>
+    </td>
 
-    <input v-if="editMode.active" type="submit" value="Valider" />
-    <input v-else type="submit" value="Ajouter" />
-  </form>
+    <td>
+      <input
+        form="transaction-form"
+        type="checkbox"
+        aria-label="Invoice"
+        id="hasInvoice"
+        name="hasInvoice"
+        value="hasInvoice"
+        v-model="formData.hasInvoice"
+      />
+    </td>
+
+    <td>
+      <form id="transaction-form" @submit.prevent="submitForm(formData)">
+        <input v-if="editMode.active" type="submit" value="Valider" />
+        <input v-else type="submit" value="Ajouter" />
+      </form>
+    </td>
+  </tr>
 </template>
 
 <style scoped></style>
