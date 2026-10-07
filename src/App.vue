@@ -170,6 +170,7 @@ async function updateTransaction(id: TransactionId, transaction: TransactionForm
   />
   <TransactionForm
     v-show="!isLoading"
+    form-id="transaction-form-create"
     :editMode="{ active: false }"
     :categories="categories"
     :subcategories="subcategories"

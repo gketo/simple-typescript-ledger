@@ -58,6 +58,7 @@ function onUpdatingError(id: TransactionId, eventData: string) {
         <template v-if="isBeingModified.has(transaction.id)">
           <td colspan="100%">
             <TransactionForm
+              :form-id="`transaction-form-${transaction.id}`"
               :editMode="{ active: true, transaction: transaction }"
               :categories="categories"
               :subcategories="subcategories"

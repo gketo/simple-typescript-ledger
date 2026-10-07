@@ -10,6 +10,7 @@ import { type TransactionFormData, formatDateInput } from '../types/TransactionF
 type EditMode = { active: true; transaction: Transaction } | { active: false; transaction?: never }
 
 const props = defineProps<{
+  formId: string
   editMode: EditMode
   categories: Category[]
   subcategories: Subcategory[]
@@ -82,7 +83,7 @@ const subcategoriesFiltered = computed(() => {
   <tr>
     <td>
       <input
-        form="transaction-form"
+        :form="formId"
         type="date"
         aria-label="date"
         id="date"
@@ -93,7 +94,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <select
-        form="transaction-form"
+        :form="formId"
         aria-label="Category"
         id="categoryId"
         name="categoryId"
@@ -107,7 +108,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <select
-        form="transaction-form"
+        :form="formId"
         aria-label="Subcategory"
         id="subcategoryId"
         name="subcategoryId"
@@ -126,7 +127,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <input
-        form="transaction-form"
+        :form="formId"
         type="text"
         aria-label="Description"
         id="description"
@@ -138,7 +139,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <input
-        form="transaction-form"
+        :form="formId"
         type="text"
         aria-label="Payee"
         id="payee"
@@ -150,7 +151,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <input
-        form="transaction-form"
+        :form="formId"
         type="number"
         step="0.01"
         aria-label="Amount"
@@ -163,7 +164,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <select
-        form="transaction-form"
+        :form="formId"
         aria-label="Account"
         id="account"
         name="account"
@@ -177,7 +178,7 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <input
-        form="transaction-form"
+        :form="formId"
         type="checkbox"
         aria-label="Invoice"
         id="hasInvoice"
@@ -188,7 +189,7 @@ const subcategoriesFiltered = computed(() => {
     </td>
 
     <td>
-      <form id="transaction-form" @submit.prevent="submitForm(formData)">
+      <form :id="formId" @submit.prevent="submitForm(formData)">
         <input v-if="editMode.active" type="submit" value="Valider" />
         <input v-else type="submit" value="Ajouter" />
       </form>
