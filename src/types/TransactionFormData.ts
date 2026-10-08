@@ -1,5 +1,6 @@
-import type { Category, Subcategory } from '@shared/types//Category'
-import type { Account } from '@shared/types//Account'
+import type { Account } from '@shared/types/Account'
+import type { Category } from '@shared/types/Category'
+import type { Subcategory } from '@shared/types/Subcategory.js'
 
 export interface TransactionFormData {
   date: string

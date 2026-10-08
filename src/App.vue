@@ -3,21 +3,21 @@ import { computed, ref, onMounted } from 'vue'
 
 import TransactionList from './components/TransactionList.vue'
 
-import type { Transaction, TransactionId } from '../shared/types/Transaction'
-import type { Category, Subcategory } from '../shared/types/Category.ts'
 import type { Account } from '../shared/types/Account.ts'
-
+import type { Category } from '../shared/types/Category.ts'
+import type { Subcategory } from '@shared/types/Subcategory.js'
+import type { Transaction, TransactionId } from '../shared/types/Transaction'
 import type { TransactionFormData } from './types/TransactionFormData.ts'
 
+import { ApiError } from './services/ApiError.ts'
+import { fetchAccounts } from './services/accounts-api.ts'
+import { fetchCategories, fetchSubcategories } from './services/categories-api.ts'
 import {
   postTransaction,
   getTransactions,
   deleteTransaction,
   putTransaction,
 } from './services/transactions-api.ts'
-import { fetchCategories, fetchSubcategories } from './services/categories-api.ts'
-import { fetchAccounts } from './services/accounts-api.ts'
-import { ApiError } from './services/ApiError.ts'
 
 const alertMsg = ref<string>('')
 

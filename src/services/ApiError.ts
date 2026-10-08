@@ -2,7 +2,7 @@ export class ApiError extends Error {
   readonly status: number = -1
   constructor(msg: string, status?: number) {
     super(msg)
-    // https://stackoverflow.com/questions/31626231/custom-error-class-in-typescript
+
     Object.setPrototypeOf(this, ApiError.prototype)
 
     if (status !== undefined) {

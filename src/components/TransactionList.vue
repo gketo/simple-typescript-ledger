@@ -3,10 +3,10 @@ import { ref } from 'vue'
 
 import TransactionForm from './TransactionForm.vue'
 
-import type { Transaction, TransactionId } from '@shared/types//Transaction'
-import type { Category, Subcategory } from '@shared/types/Category.ts'
 import type { Account } from '@shared/types/Account.ts'
-
+import type { Category } from '@shared/types/Category.ts'
+import type { Subcategory } from '@shared/types/Subcategory.js'
+import type { Transaction, TransactionId } from '@shared/types/Transaction'
 import type { TransactionFormData } from '../types/TransactionFormData.ts'
 
 const props = defineProps<{

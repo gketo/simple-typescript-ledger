@@ -1,6 +1,7 @@
 import { database } from './database.js'
 
-import type { Transaction, TransactionId, TransactionJSON } from '@shared/types/Transaction.js'
+import type { Transaction, TransactionId } from '@shared/types/Transaction.js'
+import type { TransactionJSON } from '@shared/types/TransactionJSON.js'
 
 type TransactionSQL = {
   id: number
@@ -68,6 +69,7 @@ export function dbGetTransactions(): Transaction[] {
     if (transactionSql.subcategory !== null) {
       temp.subcategory = JSON.parse(transactionSql.subcategory)
     }
+
     if (transactionSql.payee !== null) {
       temp.payee = transactionSql.payee
     }

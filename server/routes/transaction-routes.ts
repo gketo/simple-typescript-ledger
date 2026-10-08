@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { TransactionId, TransactionJSON } from '@shared/types/Transaction.js'
+import type { TransactionId } from '@shared/types/Transaction.js'
+import type { TransactionJSON } from '@shared/types/TransactionJSON.js'
 
 import {
   dbGetTransactions,

@@ -1,8 +1,7 @@
-import type { TransactionId, Transaction, TransactionJSON } from '@shared/types//Transaction'
-
-import type { TransactionFormData } from '../types/TransactionFormData.ts'
-
 import { ApiError } from './ApiError.ts'
+import type { TransactionId, Transaction } from '@shared/types/Transaction'
+import type { TransactionFormData } from '../types/TransactionFormData.ts'
+import type { TransactionJSON } from '@shared/types/TransactionJSON.ts'
 
 export async function getTransactions(): Promise<Transaction[]> {
   const response = await fetch('http://localhost:3000/transactions')
@@ -32,7 +31,7 @@ export async function getTransactions(): Promise<Transaction[]> {
       description: transactionJSON.description,
       amountInCents: transactionJSON.amountInCents,
       account: transactionJSON.account,
-      hasInvoice: transactionJSON.hasInvoice === 1,
+      hasInvoice: transactionJSON.hasInvoice,
     }
 
     if (transactionJSON.subcategory !== null) {

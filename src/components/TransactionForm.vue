@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import { type Transaction, type TransactionId } from '@shared/types/Transaction'
-import type { Category, Subcategory } from '@shared/types//Category'
-import type { Account } from '@shared/types//Account'
-
+import type { Account } from '@shared/types/Account'
+import type { Category } from '@shared/types/Category'
+import type { Subcategory } from '@shared/types/Subcategory.js'
+import type { Transaction, TransactionId } from '@shared/types/Transaction'
 import { type TransactionFormData, formatDateInput } from '../types/TransactionFormData.ts'
 
 type EditMode = { active: true; transaction: Transaction } | { active: false; transaction?: never }

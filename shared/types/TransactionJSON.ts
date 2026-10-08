@@ -1,10 +1,10 @@
-import type { Account } from './Account.ts'
-import type { Category } from './Category.js'
+import type { Account } from './Account'
+import type { Category } from './Category'
 import type { Subcategory } from './Subcategory.js'
 
-export interface Transaction {
+export type TransactionJSON = {
   id: number
-  date: Date
+  date: string
   category: Category
   subcategory?: Subcategory
   description: string
@@ -13,5 +13,3 @@ export interface Transaction {
   account: Account
   hasInvoice: boolean
 }
-
-export type TransactionId = Transaction['id']
