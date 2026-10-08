@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import { type Transaction } from '@shared/types/Transaction'
+import { type Transaction, type TransactionId } from '@shared/types/Transaction'
 import type { Category, Subcategory } from '@shared/types//Category'
 import type { Account } from '@shared/types//Account'
 
@@ -19,6 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   submit: [data: TransactionFormData]
+  delete: [id: TransactionId]
   error: [message: string]
 }>()
 
@@ -69,6 +70,10 @@ function submitForm(transaction: TransactionFormData) {
     console.warn('Invalid submit event transaction!')
     emit('error', 'Required transaction fields are missing')
   }
+}
+
+function handleDeleteTransaction(id: TransactionId) {
+  emit('delete', id)
 }
 
 // filter subcategories
@@ -190,7 +195,15 @@ const subcategoriesFiltered = computed(() => {
 
     <td>
       <form :id="formId" @submit.prevent="submitForm(formData)">
-        <input v-if="editMode.active" type="submit" value="Valider" />
+        <template v-if="editMode.active">
+          <input type="submit" value="Valider" />
+          <button
+            v-show="editMode.active"
+            @click="handleDeleteTransaction(editMode.transaction.id)"
+          >
+            [delete]
+          </button>
+        </template>
         <input v-else type="submit" value="Ajouter" />
       </form>
     </td>

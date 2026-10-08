@@ -11,12 +11,13 @@ import type { TransactionFormData } from './types/TransactionFormData.ts'
 
 import {
   postTransaction,
-  fetchTransactions,
+  getTransactions,
   deleteTransaction,
   putTransaction,
 } from './services/transactions-api.ts'
 import { fetchCategories, fetchSubcategories } from './services/categories-api.ts'
 import { fetchAccounts } from './services/accounts-api.ts'
+import { ApiError } from './services/ApiError.ts'
 
 const alertMsg = ref<string>('')
 
@@ -34,7 +35,7 @@ const isLoading = ref(false)
 async function loadTransactions() {
   try {
     isLoading.value = true
-    transactions.value = await fetchTransactions()
+    transactions.value = await getTransactions()
   } catch (err) {
     // await sleep(1000)
     console.error('Error retrieving transactions:', err)
@@ -96,7 +97,7 @@ const balance = computed(() => {
   }, 0)
 })
 
-async function createTransaction(transaction: TransactionFormData) {
+async function handleCreateTransaction(transaction: TransactionFormData) {
   try {
     const added: Transaction = await postTransaction(transaction)
 
@@ -104,16 +105,21 @@ async function createTransaction(transaction: TransactionFormData) {
 
     transactions.value.sort((a, b) => a.date.getTime() - b.date.getTime())
   } catch (err) {
-    console.error('Error adding transaction:', err)
-    if (err === 400) {
-      alertMsg.value = 'Required transaction fields are missing.'
+    if (err instanceof ApiError) {
+      console.error(err.say())
+
+      alertMsg.value =
+        err.status === 400
+          ? 'Required transaction fields are missing.'
+          : 'Unable to save transaction. Please try again later.'
     } else {
-      alertMsg.value = 'Unable to save transactions. Please try again later.'
+      console.error('Unexpected error while creating transaction:', err)
+      alertMsg.value = 'Unable to save transaction. Please try again later.'
     }
   }
 }
 
-async function removeTransaction(id: TransactionId) {
+async function handleDeleteTransaction(id: TransactionId) {
   try {
     const deleted = await deleteTransaction(id)
 
@@ -125,12 +131,16 @@ async function removeTransaction(id: TransactionId) {
       }
     }
   } catch (err) {
-    console.error('Error deleting transaction:', err)
-    alertMsg.value = 'Unable to delete transactions. Please try again later.'
+    if (err instanceof ApiError) {
+      console.error(err.say())
+    } else {
+      console.error('Unexpected error while deleting transaction:', err)
+      alertMsg.value = 'Unable to delete transaction. Please try again later.'
+    }
   }
 }
 
-async function updateTransaction(id: TransactionId, transaction: TransactionFormData) {
+async function handleUpdateTransaction(id: TransactionId, transaction: TransactionFormData) {
   try {
     const updated = await putTransaction(id, transaction)
 
@@ -146,8 +156,12 @@ async function updateTransaction(id: TransactionId, transaction: TransactionForm
 
     transactions.value[foundIndex] = updated
   } catch (err) {
-    console.error('Error updating transaction:', err)
-    alertMsg.value = 'Unable to update transactions. Please try again later.'
+    if (err instanceof ApiError) {
+      console.error(err.say())
+    } else {
+      console.error('Unexpected error while updating transaction:', err)
+      alertMsg.value = 'Unable to update transaction. Please try again later.'
+    }
   }
 }
 </script>
@@ -163,9 +177,9 @@ async function updateTransaction(id: TransactionId, transaction: TransactionForm
     :categories="categories"
     :subcategories="subcategories"
     :accounts="accounts"
-    @create="createTransaction"
-    @delete="removeTransaction"
-    @update="updateTransaction"
+    @create="handleCreateTransaction"
+    @delete="handleDeleteTransaction"
+    @update="handleUpdateTransaction"
     @error="alertMsg = $event"
   />
   <div v-show="alertMsg.length"><button @click="alertMsg = ''">&times;</button>{{ alertMsg }}</div>

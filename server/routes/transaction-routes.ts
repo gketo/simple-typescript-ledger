@@ -214,7 +214,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           })
         }
       } else {
-        console.log(transaction)
         reply.code(400).send({
           error: {
             code: 'EMPTY_FIELD',

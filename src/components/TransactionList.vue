@@ -23,23 +23,35 @@ const emit = defineEmits<{
   error: [message: string]
 }>()
 
-function createTransaction(transaction: TransactionFormData) {
+const isBeingModified = ref<Set<TransactionId>>(new Set())
+
+// Set won't trigger unless reassigned
+function startModifying(id: TransactionId) {
+  isBeingModified.value = new Set(isBeingModified.value).add(id)
+}
+
+function stopModifying(id: TransactionId) {
+  const temp = new Set(isBeingModified.value)
+  temp.delete(id)
+  isBeingModified.value = temp
+}
+
+function handleCreateTransaction(transaction: TransactionFormData) {
   emit('create', transaction)
+}
+
+function handleDeleteTransaction(id: TransactionId) {
+  stopModifying(id)
+  emit('delete', id)
+}
+
+function handleUpdateTransaction(id: TransactionId, eventData: TransactionFormData) {
+  emit('update', id, eventData)
+  stopModifying(id)
 }
 
 function onCreationError(eventData: string) {
   emit('error', `Error creating transaction: ${eventData}`)
-}
-
-function deleteTransaction(id: TransactionId) {
-  emit('delete', id)
-}
-
-const isBeingModified = ref<Set<number>>(new Set())
-
-function updateTransaction(id: TransactionId, eventData: TransactionFormData) {
-  emit('update', id, eventData)
-  isBeingModified.value.delete(id)
 }
 
 function onUpdatingError(id: TransactionId, eventData: string) {
@@ -70,7 +82,8 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           :categories="categories"
           :subcategories="subcategories"
           :accounts="accounts"
-          @submit="updateTransaction(transaction.id, $event)"
+          @submit="handleUpdateTransaction(transaction.id, $event)"
+          @delete="handleDeleteTransaction"
           @error="onUpdatingError(transaction.id, $event)"
         />
         <tr v-else>
@@ -83,15 +96,7 @@ function onUpdatingError(id: TransactionId, eventData: string) {
           <td>{{ transaction.account.name }}</td>
           <td>{{ transaction.hasInvoice }}</td>
           <td>
-            <button @click="isBeingModified.add(transaction.id)">[edit]</button>
-          </td>
-          <td>
-            <button
-              v-show="isBeingModified.has(transaction.id)"
-              @click="deleteTransaction(transaction.id)"
-            >
-              [delete]
-            </button>
+            <button @click="startModifying(transaction.id)">[edit]</button>
           </td>
         </tr>
       </template>
@@ -101,7 +106,8 @@ function onUpdatingError(id: TransactionId, eventData: string) {
         :categories="categories"
         :subcategories="subcategories"
         :accounts="accounts"
-        @submit="createTransaction"
+        @submit="handleCreateTransaction"
+        @delete="handleDeleteTransaction"
         @error="onCreationError"
       />
     </tbody>
